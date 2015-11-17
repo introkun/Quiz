@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1171</width>
+    <height>714</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>471</width>
+      <height>681</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="mainLayout"/>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1171</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave"/>
+    <addaction name="actionMode"/>
+    <addaction name="actionRegistration"/>
+    <addaction name="actionModemReset"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuPicture">
+    <property name="title">
+     <string>Picture</string>
+    </property>
+    <addaction name="actionSetPicture"/>
+    <addaction name="actionClearPicture"/>
+   </widget>
+   <widget class="QMenu" name="menuFonts">
+    <property name="title">
+     <string>Fonts</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuModemOnline">
+    <property name="title">
+     <string>ModemOnline</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>?</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menuPicture"/>
+   <addaction name="menuFonts"/>
+   <addaction name="menuModemOnline"/>
+   <addaction name="menu_2"/>
+  </widget>
+  <action name="actionOpenAndPlay">
+   <property name="text">
+    <string>OpenAndPlay</string>
+   </property>
+  </action>
+  <action name="actionOpenAndEdit">
+   <property name="text">
+    <string>OpenAndEdit</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionMode">
+   <property name="text">
+    <string>Mode</string>
+   </property>
+  </action>
+  <action name="actionSetPicture">
+   <property name="text">
+    <string>SetPicture</string>
+   </property>
+  </action>
+  <action name="actionClearPicture">
+   <property name="text">
+    <string>ClearPicture</string>
+   </property>
+  </action>
+  <action name="actionFontQestion">
+   <property name="text">
+    <string>FontQestion</string>
+   </property>
+  </action>
+  <action name="actionFontCaption">
+   <property name="text">
+    <string>FontCaption</string>
+   </property>
+  </action>
+  <action name="actionFontAnswer">
+   <property name="text">
+    <string>FontAnswer</string>
+   </property>
+  </action>
+  <action name="actionFontTime">
+   <property name="text">
+    <string>FontTime</string>
+   </property>
+  </action>
+  <action name="actionRegistration">
+   <property name="text">
+    <string>Registration</string>
+   </property>
+  </action>
+  <action name="actionModemReset">
+   <property name="text">
+    <string>ModemReset</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

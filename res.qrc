@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/clearimage.png</file>
+        <file>images/setimage.png</file>
+        <file>sounds/answer.wav</file>
+        <file>sounds/falsestart.wav</file>
+        <file>sounds/time.wav</file>
+        <file>sounds/truestart.wav</file>
+        <file>images/papirus.jpg</file>
+    </qresource>
+</RCC>
