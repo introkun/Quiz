@@ -15,6 +15,8 @@ public:
     virtual QString name() const;
     virtual void setEditable(bool value);
     virtual void changeSize();
+protected:
+    virtual void showEvent(QShowEvent * event);
 private:
     QQuestionsTableWidget * questionsTable;
     QGridLayout * layoutAnswers, * layoutCommands;

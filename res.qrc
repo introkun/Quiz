@@ -7,5 +7,7 @@
         <file>sounds/time.wav</file>
         <file>sounds/truestart.wav</file>
         <file>images/papirus.jpg</file>
+        <file>images/minus.png</file>
+        <file>images/plus.png</file>
     </qresource>
 </RCC>

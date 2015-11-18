@@ -32,6 +32,12 @@ QParallelQuiz::~QParallelQuiz()
     delete layoutMain;
 }
 
+void QParallelQuiz::showEvent(QShowEvent * event)
+{
+    changeSize();
+    QGame::showEvent(event);
+
+}
 
 QString QParallelQuiz::name() const
 {
@@ -60,3 +66,5 @@ void QParallelQuiz::changeSize()
         table_width = questionsTable -> viewport() -> width();
     }
 }
+
+
