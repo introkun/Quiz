@@ -1,3 +1,4 @@
+#include "../../qobjecthelper.h"
 #include "qparallelquiz.h"
 
 QParallelQuiz::QParallelQuiz(QWidget *parent) :
@@ -21,7 +22,6 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
     layoutMain -> addLayout(layoutCommands);
     layoutMain -> addLayout(layoutAnswers);
     setEditable(false);
-    table_width = -1;
 }
 
 QParallelQuiz::~QParallelQuiz()
@@ -39,6 +39,11 @@ void QParallelQuiz::showEvent(QShowEvent * event)
 
 }
 
+void QParallelQuiz::changeSize()
+{
+    questionsTable -> changeSize();
+}
+
 QString QParallelQuiz::name() const
 {
     return tr("Командная эстафета");
@@ -52,32 +57,36 @@ void QParallelQuiz::setEditable(bool value)
 }
 
 
-void QParallelQuiz::changeSize()
-{
-    //перерисовка таблиц
-    if (table_width != questionsTable -> viewport() -> width())
-    {
-        questionsTable -> setColumnWidth(0, (questionsTable -> viewport() -> width()) * 0.5);
-        questionsTable -> setColumnWidth(1, (questionsTable -> viewport() -> width()) * 0.1);
-        questionsTable -> setColumnWidth(2, (questionsTable -> viewport() -> width()) * 0.1);
-        questionsTable -> setColumnWidth(3, (questionsTable -> viewport() -> width()) * 0.1);
-        questionsTable -> setColumnWidth(4, (questionsTable -> viewport() -> width()) * 0.1);
-        questionsTable -> setColumnWidth(5, (questionsTable -> viewport() -> width()) * 0.1);
-        table_width = questionsTable -> viewport() -> width();
-    }
-}
+
 
 //Получить карту json кода игры
 QVariantMap QParallelQuiz::getJsonData()
 {
     QVariantMap game_map;
     game_map["type"] = _gameType;
+    QList<QQuestion> questions = questionsTable -> questions();
+    QVariantList questions_list;
+    foreach(QQuestion question,questions)
+        questions_list.append(QObjectHelper::qobject2qvariant(&question));
+    game_map["questions"] = questions_list;
     return game_map;
 }
 
 //Настроить игру из карты JSON
 bool QParallelQuiz::setFromJsonData(const QVariantMap & map)
 {
+    QQuestion question;
+    QVariantList question_list = map["questions"].toList();
+    QList<QQuestion> questions;
+    foreach(QVariant var_question, question_list)
+    {
+        QObjectHelper::qvariant2qobject(var_question.toMap(),&question);
+        questions.append(question);
+    }
+    questionsTable -> setQuestions(questions);
 
+    if (map["picture"].isValid())
+        picture = QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG");
+    return true;
 }
 

@@ -8,10 +8,11 @@ class QQuestionsTableWidget : public QTableWidget
 {
     Q_OBJECT
 public:
-    explicit QQuestionsTableWidget(QWidget *parent = 0);
+    explicit QQuestionsTableWidget(QWidget *parent = 0,bool rating = false);
     ~QQuestionsTableWidget();
     void setQuestions(const QList<QQuestion> & questions);
     QList<QQuestion>  questions() const;
+    void changeSize();
 private slots:
     void menuPopUp();
     void addQuestionRow();
@@ -21,6 +22,7 @@ private:
     void deleteMenu();
 
     QMenu * menu;
+    int table_width;//текущая ширина таблицы вопросов в режиме редактирования
 };
 
 #endif // QQUESTIONSTABLEWIDGET_H

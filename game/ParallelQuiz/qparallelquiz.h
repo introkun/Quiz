@@ -26,7 +26,6 @@ private:
     QQuestionsTableWidget * questionsTable;
     QGridLayout * layoutAnswers, * layoutCommands;
     QVBoxLayout * layoutMain;
-    int table_width;//текущая ширина таблицы вопросов в режиме редактирования
 };
 
 #endif // QPARALLELQUIZ_H
