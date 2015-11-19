@@ -16,14 +16,15 @@ QDbManipulator::QDbManipulator(QObject *parent) :
  * Возвращает списки данных для загрузки
  * error - ошибка
  */
-QList<QTheme *>  QDbManipulator::load(const QString & fileName,QImage & picture,QString & error,QWidget * theme_parent)
+QList<QGame *>  QDbManipulator::load(const QString & fileName,QString & error,QWidget * parent)
 {
-    QList<QTheme *> themes_return_list;
+    bool ok;
+    QList<QGame *> games_return_list;
     QFile jf(fileName);
     if (!jf.open(QIODevice::ReadOnly))
     {
         error = tr("Ошибка открытия файла ") + fileName;
-        return themes_return_list;
+        return games_return_list;
     }
     QByteArray bytes = jf.readAll();
     QJsonParseError json_error;
@@ -32,38 +33,40 @@ QList<QTheme *>  QDbManipulator::load(const QString & fileName,QImage & picture,
     if (json_error.error != QJsonParseError::NoError)
     {
         error = json_error.errorString();
-        return themes_return_list;
+        return games_return_list;
     }
     json_obj = json_doc.object();
     QVariantMap file_map = json_obj.toVariantMap();
 
-    QVariantList themes_list = file_map["themes"].toList();
-
-    //выделяем карты конфигураций
-    foreach(QVariant value, themes_list)
+    QVariantList games_list = file_map["games"].toList();
+    foreach(QVariant game,games_list)
     {
-        QTheme * theme = new QTheme(theme_parent);
-        theme -> setThemeMap(value.toMap());
-        themes_return_list.append(theme);
+        QVariantMap game_map = game.toMap();
+        int game_type = game_map["type"].toInt(&ok);
+        if (!ok)
+            continue;
+        //пробуем создать игру заданного типа
+        QGame * createGame = QGame::createGame((QGame::GAME_TYPE)game_type,parent);
+        if (createGame)
+        {
+            games_return_list.append(createGame);
+            createGame -> setFromJsonData(game_map);//внутренняя настройка игры с карты
+        }
     }
 
-    if (file_map["picture"].isValid())
-    {
-        picture = QImage::fromData(QByteArray::fromBase64(file_map["picture"].toByteArray()),"PNG");
-    }
-    return themes_return_list;
+    return games_return_list;
 }
 
 
 /* Сохранение информации в файл
  * Входные данные:
  * fileName - имя файла(с путем к нему) для сохранения
- * theme_list - список данных для сохранения
+ * game_list - список игр для сохранения
  * Выходные данные
  * Возвращает true в случае успешного сохранения, иначе false
  * error - ошибка
  */
-bool QDbManipulator::save(const QString & fileName,const QList<QTheme *> & theme_list,const QImage & picture, QString & error)
+bool QDbManipulator::save(const QString & fileName,const QList<QGame *> & game_list, QString & error)
 {
     QFile jf(fileName);
     if (!jf.open(QIODevice::WriteOnly))
@@ -71,22 +74,11 @@ bool QDbManipulator::save(const QString & fileName,const QList<QTheme *> & theme
         error = tr("Ошибка открытия файла ") + fileName;
         return false;
     }
-
     QVariantMap file_map;//карта файл
-    QVariantList th_list;
-    foreach (QTheme * theme, theme_list)
-        th_list.append(theme -> themeMap());
-    file_map["themes"] = th_list;
-
-    if (!picture.isNull())
-    {
-        QByteArray ba;
-        QBuffer buffer(&ba);
-        buffer.open(QIODevice::WriteOnly);
-        picture.save(&buffer, "PNG");
-        file_map["picture"] = ba.toBase64();
-    }
-
+    QVariantList tmp_game_list;
+    foreach(QGame * game, game_list)
+        tmp_game_list.append(game -> getJsonData());
+    file_map["games"] = tmp_game_list;
     QJsonObject json_obj;
     QJsonDocument json_doc;
     json_obj = QJsonObject::fromVariantMap(file_map);

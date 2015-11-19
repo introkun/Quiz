@@ -67,4 +67,17 @@ void QParallelQuiz::changeSize()
     }
 }
 
+//Получить карту json кода игры
+QVariantMap QParallelQuiz::getJsonData()
+{
+    QVariantMap game_map;
+    game_map["type"] = _gameType;
+    return game_map;
+}
+
+//Настроить игру из карты JSON
+bool QParallelQuiz::setFromJsonData(const QVariantMap & map)
+{
+
+}
 

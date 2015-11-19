@@ -15,6 +15,11 @@ public:
     virtual QString name() const;
     virtual void setEditable(bool value);
     virtual void changeSize();
+
+    //Получить карту json кода игры
+    virtual QVariantMap getJsonData();
+    //Настроить игру из карты JSON
+    virtual  bool setFromJsonData(const QVariantMap & map);
 protected:
     virtual void showEvent(QShowEvent * event);
 private:

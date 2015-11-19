@@ -23,6 +23,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private slots:
+    void uiSetupGames(const QList<QGame *> games);
     void saveJSON();
     void loadJSON();
     void selectWorkMode();

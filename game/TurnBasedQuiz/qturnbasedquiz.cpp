@@ -113,3 +113,43 @@ void QTurnBasedQuiz::questionClicked(QQuestionWidget * widget,Qt::MouseButton bu
     }
     update();
 }
+
+
+//Получить карту json кода игры
+QVariantMap QTurnBasedQuiz::getJsonData()
+{
+    QVariantList th_list;
+    QVariantMap game_map;
+    game_map["type"] = _gameType;
+    foreach (QTheme * theme, _themes)
+        th_list.append(theme -> themeMap());
+    game_map["themes"] = th_list;
+    if (!picture.isNull())
+    {
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::WriteOnly);
+        picture.save(&buffer, "PNG");
+        game_map["picture"] = ba.toBase64();
+    }
+    return game_map;
+}
+
+//Настроить игру из карты JSON
+bool QTurnBasedQuiz::setFromJsonData(const QVariantMap & map)
+{
+
+   QVariantList themes_list = map["themes"].toList();
+   QList<QTheme *> themes;
+   foreach(QVariant value, themes_list)
+   {
+       QTheme * theme = new QTheme(parentWidget());
+       theme -> setThemeMap(value.toMap());
+       themes.append(theme);
+   }
+   setThemes(themes);
+
+   if (map["picture"].isValid())
+       picture = QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG");
+   return true;
+}

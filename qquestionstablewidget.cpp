@@ -1,3 +1,4 @@
+#include <QComboBox>
 #include "qquestionstablewidget.h"
 
 QQuestionsTableWidget::QQuestionsTableWidget(QWidget *parent) : QTableWidget(parent)
@@ -7,6 +8,7 @@ QQuestionsTableWidget::QQuestionsTableWidget(QWidget *parent) : QTableWidget(par
     setColumnCount(6);
     setHorizontalHeaderLabels(sl);
     initMenu();
+    setSelectionBehavior(SelectRows);
 
 }
 
@@ -24,12 +26,12 @@ void QQuestionsTableWidget::initMenu()
     action = menu -> addAction(QIcon(":/images/plus.png"),tr("Добавить вопрос"));
     action -> setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
     action -> setShortcutContext(Qt::WidgetShortcut);
-    //connect(action,SIGNAL(triggered()),this,SLOT(ui_add_rc_button_clicked()));
+    connect(action,SIGNAL(triggered()),this,SLOT(addQuestionRow()));
 
     action = menu -> addAction(QIcon(":/images/minus.png"),tr("Удалить вопрос"));
     action -> setShortcut(QKeySequence(Qt::Key_Delete));
     action -> setShortcutContext(Qt::WidgetShortcut);
-    //connect(action,SIGNAL(triggered()),this,SLOT(ui_edit_rc_button_clicked()));
+    connect(action,SIGNAL(triggered()),this,SLOT(deleteQuestionRow()));
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(menuPopUp()));
 }
@@ -51,6 +53,42 @@ void QQuestionsTableWidget::menuPopUp()
     actions.at(0) -> setText(tr("Добавить вопрос"));
     actions.at(1) -> setText(tr("Удалить вопрос"));
     menu -> popup(QCursor::pos());
+}
+
+void QQuestionsTableWidget::addQuestionRow()
+{
+    insertRow(rowCount());
+    QComboBox * combobox = new QComboBox();
+    for (int i = 1; i < 5; i++)
+        combobox -> addItem(QString::number(i));
+    setCellWidget(rowCount() - 1,5,combobox);
+}
+
+void QQuestionsTableWidget::deleteQuestionRow()
+{
+    QList<int> rows;
+    QList<QTableWidgetItem *> sil = selectedItems();
+    for (int row = rowCount() - 1; row >= 0 ; row--)
+        foreach (QTableWidgetItem * twi,sil)
+            if (item(row,0) == twi)
+            {
+                rows.append(row);
+                break;
+            }
+
+    foreach(int row,rows)
+        removeRow(row);
+}
+
+
+void QQuestionsTableWidget::setQuestions(const QList<QQuestion> & questions)
+{
+
+}
+
+QList<QQuestion> QQuestionsTableWidget::questions() const
+{
+
 }
 
 

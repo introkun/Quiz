@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    QList<QGame *> games;
     games.append(QGame::createGame(QGame::GAME_TURNBASEDQUIZ,this));
     games.append(QGame::createGame(QGame::GAME_PARALLELQUIZ,this));
     im = new QInterface_Manager();
@@ -18,11 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     installEventFilter(ev_fltr);
     gamesTabWidget = new QTabWidget();
     ui -> mainLayout -> addWidget(gamesTabWidget);
-    foreach(QGame * game,games)
-    {
-        gamesTabWidget -> addTab(game,game -> name());
-        connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),game,SIGNAL(signalRCClicked(uint,unsigned short)));
-    }
+    uiSetupGames(games);
     setWindowTitle("Quiz");
     connect(ui -> actionSave,SIGNAL(triggered()),this,SLOT(saveJSON()));
     connect(ui -> actionMode,SIGNAL(triggered()),this,SLOT(selectWorkMode()));
@@ -120,6 +117,22 @@ void MainWindow::showEvent (QShowEvent * event)
 }
 
 
+void MainWindow::uiSetupGames(const QList<QGame *> games)
+{
+    while(this -> games.count())
+    {
+        delete this -> games.first();
+        this -> games.removeFirst();
+    }
+    foreach(QGame * game,games)
+    {
+        gamesTabWidget -> addTab(game,game -> name());
+        connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),game,SIGNAL(signalRCClicked(uint,unsigned short)));
+    }
+    this -> games = games;
+}
+
+
 
 void MainWindow::saveJSON()
 {
@@ -128,7 +141,7 @@ void MainWindow::saveJSON()
         json_file = QFileDialog::getSaveFileName(this,tr("Сохранение файла базы данных"), "","*.json");
     if (json_file.isEmpty())
         return;
-    QDbManipulator::save(json_file,dynamic_cast<QTurnBasedQuiz *>(games.at(0)) -> themes(),games.at(0) -> image(),error);
+    QDbManipulator::save(json_file,games,error);
 }
 
 
@@ -138,12 +151,10 @@ void MainWindow::loadJSON()
     QString json_file = QFileDialog::getOpenFileName(this,tr("Загрузка файла базы данных"), "","*.json");
     if (json_file.isEmpty())
         return;
-    QImage picture;
-    QList<QTheme *> themes = QDbManipulator::load(json_file,picture,error,this);
-    dynamic_cast<QTurnBasedQuiz *>(games.at(0)) -> setThemes(themes);
+    QList<QGame *> games = QDbManipulator::load(json_file,error,this);
+    uiSetupGames(games);
     if (error.isEmpty())
         this -> json_file = json_file;
-    games.at(0) -> setImage(picture);
 }
 
 

@@ -6,7 +6,7 @@
 #include <QString>
 #include <QTime>
 #include <QObject>
-#include "game/TurnBasedQuiz/qtheme.h"
+#include "game/qgame.h"
 #include "qregistrationdialog.h"
 class QDbManipulator : public QObject
 {
@@ -21,7 +21,7 @@ public:
      * Возвращает списки данных для загрузки
      * error - ошибка
      */
-    static QList<QTheme *>  load(const QString & fileName,QImage & picture,QString & error,QWidget * theme_parent);
+    static QList<QGame *>  load(const QString & fileName,QString & error,QWidget * parent);
     /* Сохранение информации в файл
      * Входные данные:
      * fileName - имя файла(с путем к нему) для сохранения
@@ -30,7 +30,7 @@ public:
      * Возвращает true в случае успешного сохранения, иначе false
      * error - ошибка
      */
-    static bool save(const QString & fileName,const QList<QTheme *> & theme_list,const QImage & picture, QString & error);
+    static bool save(const QString & fileName,const QList<QGame *> & game_list,QString & error);
 
     static bool loadConfiguration(QList<QRegistrationDialog::REG_DEVICE_T> & devices, QList<QFont> & fonts);
     static bool saveConfiguration(const QList<QRegistrationDialog::REG_DEVICE_T> & reg_devices,const QList<QFont> & fonts);

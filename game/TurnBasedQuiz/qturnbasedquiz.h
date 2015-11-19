@@ -24,6 +24,11 @@ public:
     virtual void setEditable(bool value);
     virtual QString name() const;
     virtual void setFonts(const QList<QFont> & new_fonts);
+
+    //Получить карту json кода игры
+    virtual QVariantMap getJsonData();
+    //Настроить игру из карты JSON
+    virtual  bool setFromJsonData(const QVariantMap & map);
 signals:
     void signalQuestionClicked(QQuestionWidget*,Qt::MouseButton);
 private slots:

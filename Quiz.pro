@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     game/TurnBasedQuiz/qturnbasedquiz.cpp \
     game/ParallelQuiz/qparallelquiz.cpp \
     qquestionstablewidget.cpp \
-    event_filter.cpp
+    event_filter.cpp \
+    qquestion.cpp
 
 HEADERS  += mainwindow.h \
     qobjecthelper.h \
@@ -59,7 +60,8 @@ HEADERS  += mainwindow.h \
     game/TurnBasedQuiz/qturnbasedquiz.h \
     game/ParallelQuiz/qparallelquiz.h \
     qquestionstablewidget.h \
-    event_filter.h
+    event_filter.h \
+    qquestion.h
 
 FORMS    += mainwindow.ui
 
