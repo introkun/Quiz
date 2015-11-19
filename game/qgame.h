@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QLayout>
+#include "../qregistrationdialog.h"
 class QGame : public QWidget
 {
     Q_OBJECT
@@ -21,8 +22,13 @@ public:
     void setImage(const QImage & picture);
     QImage image() const {return picture;}
     virtual void changeSize(){}
-signals:
 
+    QList<QFont> fonts() const { return _fonts;}
+    virtual void setFonts(const QList<QFont> & new_fonts) {_fonts = new_fonts;}
+    void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list){_rc_list = rc_list;}
+    QList<QRegistrationDialog::REG_DEVICE_T> rcList() const {return _rc_list;}
+signals:
+    void signalRCClicked(uint,unsigned short);
 public slots:
 
 protected:
@@ -30,6 +36,8 @@ protected:
     GAME_TYPE _gameType;
     bool edit_mode;
     QImage picture;
+    QList<QFont> _fonts;
+    QList<QRegistrationDialog::REG_DEVICE_T> _rc_list;
 };
 
 #endif // QGAME_H

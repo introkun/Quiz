@@ -220,7 +220,7 @@ void QQuestionDialog::timerTick()
 }
 
 
-void QQuestionDialog::rcClicked(unsigned int mac)
+void QQuestionDialog::rcClicked(unsigned int mac,unsigned short group)
 {
 
     for (int i = 0; i < rc_macs.count(); i++)

@@ -1,5 +1,6 @@
+#include <QMessageBox>
 #include "qturnbasedquiz.h"
-
+#include "qquestiondialog.h"
 QTurnBasedQuiz::QTurnBasedQuiz(QWidget *parent) :
     QGame(parent)
 {
@@ -58,7 +59,7 @@ void QTurnBasedQuiz::setThemes(const QList<QTheme *> & themes)
     }
     //связуем нажатие по виджету с открытием вопроса
     foreach (QTheme * theme,_themes )
-        connect(theme,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)),this,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)));
+        connect(theme,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)),this,SLOT(questionClicked(QQuestionWidget*,Qt::MouseButton)));
     fillThemes();
 }
 
@@ -73,4 +74,42 @@ void QTurnBasedQuiz::setEditable(bool value)
 QString QTurnBasedQuiz::name() const
 {
     return tr("Основная электронная викторина");
+}
+
+
+void QTurnBasedQuiz::setFonts(const QList<QFont> & new_fonts)
+{
+    _fonts = new_fonts;
+    //наращиваем количество шрифтов до количества, необходимого для игры
+    while(_fonts.size() < FONT_LAST)
+        _fonts.append(font());
+}
+
+
+void QTurnBasedQuiz::questionClicked(QQuestionWidget * widget,Qt::MouseButton button)
+{
+    QTheme * theme;
+    //закрытие виджета по правой кнопке
+    if (button == Qt::RightButton)
+    {
+        if (QMessageBox::warning(this,tr("Предупреждение"), tr("Вопрос будет закрыт. Продолжить?"),QMessageBox::Yes,QMessageBox::No) == QMessageBox::Yes)
+            widget -> hide();
+        return;
+    }
+    QImage image;
+    foreach (theme, _themes)
+        if (theme -> isChild(widget))
+        {
+            image = theme -> image();
+            break;
+        }
+    QQuestionDialog * qd = new QQuestionDialog(this,widget -> question(),widget -> answer(),image,_fonts,_rc_list,QString("%1(%2)").arg(theme -> name(),QString::number(widget -> rating())));
+    connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),qd,SLOT(rcClicked(uint,unsigned short)));
+    int result = qd -> exec();
+    delete qd;
+    if (result == QDialog::Accepted)
+    {
+        widget -> hide();
+    }
+    update();
 }

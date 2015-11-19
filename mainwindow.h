@@ -26,7 +26,6 @@ private slots:
     void saveJSON();
     void loadJSON();
     void selectWorkMode();
-    void questionClicked(QQuestionWidget * widget,Qt::MouseButton button);
     void set_interface_status(bool value);
     void rs232_cmd_income(QByteArray buf);
     void start_autoconnect();
@@ -43,24 +42,14 @@ protected:
     virtual void showEvent (QShowEvent * event);
 signals:
     void signal_start_autoconnect();
-    void signalRCClicked(unsigned int);
+    void signalRCClicked(unsigned int,unsigned short);
 private:
-    typedef enum {
-        FONT_CAPTION = 0,
-        FONT_QUESTION,
-        FONT_TIME,
-        FONT_ANSWER,
-        FONT_QUEUE,
-        FONT_BUTTON,
-        FONT_LAST
-    } FONT_ACTIONS;
     Ui::MainWindow *ui;
 
     bool first_show;
     QString json_file;
     QInterface_Manager * im;
     QAutoConnectTool * auto_connect;
-    QList <QFont> fonts;
     QList <QAction *> font_actions;
     QList<QRegistrationDialog::REG_DEVICE_T> reg_devices;
     QList<QGame *> games;

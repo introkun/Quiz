@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "qdbmanipulator.h"
 #include "qchoicedialog.h"
-#include "game/TurnBasedQuiz/qquestiondialog.h"
 #include "qaboutdialog.h"
 #include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
@@ -18,10 +17,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ev_fltr,SIGNAL(form_resize()),this,SLOT(formResize()));
     installEventFilter(ev_fltr);
     gamesTabWidget = new QTabWidget();
-    //ui -> mainLayout -> addWidget(games.at(0));
     ui -> mainLayout -> addWidget(gamesTabWidget);
     foreach(QGame * game,games)
+    {
         gamesTabWidget -> addTab(game,game -> name());
+        connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),game,SIGNAL(signalRCClicked(uint,unsigned short)));
+    }
     setWindowTitle("Quiz");
     connect(ui -> actionSave,SIGNAL(triggered()),this,SLOT(saveJSON()));
     connect(ui -> actionMode,SIGNAL(triggered()),this,SLOT(selectWorkMode()));
@@ -46,36 +47,36 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> menuFonts -> setTitle(tr("Шрифты"));
     ui -> actionAbout -> setText(tr("О программе"));
     first_show = true;
-    QString s;
-    for (int i = 0; i < FONT_LAST; i++)
+    QString s;    
+    QList <QFont> fonts;
+    for (int i = 0; i < QTurnBasedQuiz::FONT_LAST; i++)
     {
         switch (i)
         {
-        case FONT_CAPTION:
+        case QTurnBasedQuiz::FONT_CAPTION:
             s = tr("Шрифт заголовка");
             break;
-        case FONT_QUESTION:
+        case QTurnBasedQuiz::FONT_QUESTION:
             s = tr("Шрифт вопроса");
             break;
-        case FONT_TIME:
+        case QTurnBasedQuiz::FONT_TIME:
             s = tr("Шрифт времени");
             break;
-        case FONT_ANSWER:
+        case QTurnBasedQuiz::FONT_ANSWER:
             s = tr("Шрифт ответа");
             break;
-        case FONT_QUEUE:
+        case QTurnBasedQuiz::FONT_QUEUE:
             s = tr("Шрифт очереди");
             break;
-        case FONT_BUTTON:
+        case QTurnBasedQuiz::FONT_BUTTON:
             s = tr("Шрифт кнопки");
             break;
         }
-        fonts.append(font());
+        fonts.append(font());      
         font_actions.append(new QAction(s,this));
-
-
         connect(font_actions.last(),SIGNAL(triggered()),this,SLOT(changeFont()));
     }
+    games.at(0)-> setFonts(fonts);
     ui -> menuFonts -> addActions(font_actions);
     set_interface_status(false);
 }
@@ -113,10 +114,7 @@ void MainWindow::showEvent (QShowEvent * event)
         emit signal_start_autoconnect();
         first_show = false;
         if (QDbManipulator::loadConfiguration(reg_devices, tmp_fonts))
-        {
-            if (tmp_fonts.count() >= FONT_LAST)
-                fonts = tmp_fonts;
-        }
+            games.at(0) -> setFonts(tmp_fonts);
         selectWorkMode();
     }
 }
@@ -169,7 +167,6 @@ void MainWindow::selectWorkMode()
         loadJSON();
         foreach (QGame * game,games)
             game -> setEditable(false);
-        connect(dynamic_cast<QTurnBasedQuiz *>(games.at(0)),SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)),this,SLOT(questionClicked(QQuestionWidget*,Qt::MouseButton)));
         ui -> actionSave -> setVisible(false);
         break;
 
@@ -196,33 +193,7 @@ void MainWindow::selectWorkMode()
 }
 
 
-void MainWindow::questionClicked(QQuestionWidget * widget,Qt::MouseButton button)
-{
-    QTheme * theme;
-    //закрытие виджета по правой кнопке
-    if (button == Qt::RightButton)
-    {
-        if (QMessageBox::warning(this,tr("Предурпеждение"), tr("Вопрос будет закрыт. Продолжить?"),QMessageBox::Yes,QMessageBox::No) == QMessageBox::Yes)
-            widget -> hide();
-        return;
-    }
-    QImage image;
-    foreach (theme, dynamic_cast<QTurnBasedQuiz *>(games.at(0)) -> themes())
-        if (theme -> isChild(widget))
-        {
-            image = theme -> image();
-            break;
-        }
-    QQuestionDialog * qd = new QQuestionDialog(this,widget -> question(),widget -> answer(),image,fonts,reg_devices,QString("%1(%2)").arg(theme -> name(),QString::number(widget -> rating())));
-    connect(this,SIGNAL(signalRCClicked(uint)),qd,SLOT(rcClicked(uint)));
-    int result = qd -> exec();
-    delete qd;
-    if (result == QDialog::Accepted)
-    {
-        widget -> hide();
-    }
-    update();
-}
+
 
 void MainWindow::set_interface_status(bool value)
 {
@@ -241,11 +212,13 @@ void MainWindow::rs232_cmd_income(QByteArray buf)
     if (mess.getCommand() == 0x1509)
     {
         QByteArray cmd_data = mess.netroCommand();
-        if (cmd_data.count() > sizeof(int))
+        if (cmd_data.count() > sizeof(uint32) + sizeof(uint16))
         {
             uint32 mac;
-            memcpy(&mac,cmd_data.data(),sizeof(int));
-            emit signalRCClicked(mac);
+            uint16 group;
+            memcpy(&mac,cmd_data.data(),sizeof(uint32));
+            memcpy(&group,cmd_data.data() + sizeof(uint32),sizeof(uint16));
+            emit signalRCClicked(mac,group);
         }
     }
 }
@@ -313,13 +286,17 @@ void MainWindow::changeFont()
 {
     bool ok;
     QFont new_font;
+    QList<QFont> fonts;
     for (int i = 0; i < font_actions.size(); i++)
         if (sender() == font_actions.at(i))
         {
+            fonts = games.at(0) -> fonts();
             new_font = QFontDialog::getFont(&ok,fonts.at(i),this);
             if (ok)
             {
+
                 fonts.replace(i,new_font);
+                games.at(0) -> setFonts(fonts);
                 QDbManipulator::saveConfiguration(reg_devices,fonts);
             }
             break;
@@ -335,7 +312,9 @@ void MainWindow::registration()
     if (rd -> exec() == QDialog::Accepted)
     {
         reg_devices = rd -> getRegDevices();
-        QDbManipulator::saveConfiguration(reg_devices,fonts);
+        foreach(QGame * game,games)
+            game -> setRCList(reg_devices);
+        QDbManipulator::saveConfiguration(reg_devices,games.at(0) -> fonts());
     }
     delete rd;
 }

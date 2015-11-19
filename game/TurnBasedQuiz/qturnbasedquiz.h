@@ -8,16 +8,26 @@ class QTurnBasedQuiz : public QGame
 {
     Q_OBJECT
 public:
+    typedef enum {
+        FONT_CAPTION = 0,
+        FONT_QUESTION,
+        FONT_TIME,
+        FONT_ANSWER,
+        FONT_QUEUE,
+        FONT_BUTTON,
+        FONT_LAST
+    } FONT_ACTIONS;
     explicit QTurnBasedQuiz(QWidget *parent = 0);
     virtual ~QTurnBasedQuiz();
     void setThemes(const QList<QTheme *> & themes);
     QList<QTheme *> themes() const {return _themes;}
     virtual void setEditable(bool value);
     virtual QString name() const;
+    virtual void setFonts(const QList<QFont> & new_fonts);
 signals:
     void signalQuestionClicked(QQuestionWidget*,Qt::MouseButton);
-public slots:
-
+private slots:
+    void questionClicked(QQuestionWidget * widget,Qt::MouseButton button);
 private:
     void fillThemes();
     QList<QSpacerItem *> spacer_items;

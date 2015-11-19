@@ -17,7 +17,7 @@ public:
     explicit QQuestionDialog(QWidget *parent = 0,const QString & question = QString(), const QString & answer = QString(),const QImage & image = QImage(),const QList<QFont> & fonts = QList<QFont>(), const QList<QRegistrationDialog::REG_DEVICE_T> & reg_rc = QList<QRegistrationDialog::REG_DEVICE_T>(),const QString & caption = QString());
     ~QQuestionDialog();
 public slots:
-    void rcClicked(unsigned int mac);
+    void rcClicked(unsigned int mac,unsigned short group);
 protected:
     virtual void showEvent (QShowEvent * event);
 private slots:
