@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     game/ParallelQuiz/qparallelquiz.cpp \
     qquestionstablewidget.cpp \
     event_filter.cpp \
-    qquestion.cpp
+    qquestion.cpp \
+    game/ParallelQuiz/qteamwidget.cpp
 
 HEADERS  += mainwindow.h \
     qobjecthelper.h \
@@ -61,7 +62,8 @@ HEADERS  += mainwindow.h \
     game/ParallelQuiz/qparallelquiz.h \
     qquestionstablewidget.h \
     event_filter.h \
-    qquestion.h
+    qquestion.h \
+    game/ParallelQuiz/qteamwidget.h
 
 FORMS    += mainwindow.ui
 

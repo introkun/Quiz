@@ -3,9 +3,10 @@
 
 #include <QWidget>
 #include <QLayout>
+#include <QSpacerItem>
 #include "../qgame.h"
 #include "../../qquestionstablewidget.h"
-
+#include "qteamwidget.h"
 class QParallelQuiz : public QGame
 {
     Q_OBJECT
@@ -15,7 +16,7 @@ public:
     virtual QString name() const;
     virtual void setEditable(bool value);
     virtual void changeSize();
-
+    virtual void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list);
     //Получить карту json кода игры
     virtual QVariantMap getJsonData();
     //Настроить игру из карты JSON
@@ -26,6 +27,12 @@ private:
     QQuestionsTableWidget * questionsTable;
     QGridLayout * layoutAnswers, * layoutCommands;
     QVBoxLayout * layoutMain;
+    QSpacerItem * vspacer;
+    QList<QTeamWidget *> teams;
+    QPushButton * mainButton;
+    QLabel * labelQuestion;
+    QLabel * labelTime;
+    QList<QLabel *> labelsAnswer;
 };
 
 #endif // QPARALLELQUIZ_H

@@ -111,7 +111,9 @@ void MainWindow::showEvent (QShowEvent * event)
         emit signal_start_autoconnect();
         first_show = false;
         if (QDbManipulator::loadConfiguration(reg_devices, tmp_fonts))
+        {
             games.at(0) -> setFonts(tmp_fonts);
+        }
         selectWorkMode();
     }
 }
@@ -177,7 +179,10 @@ void MainWindow::selectWorkMode()
         setWindowState(Qt::WindowFullScreen);
         loadJSON();
         foreach (QGame * game,games)
+        {
             game -> setEditable(false);
+            game -> setRCList(reg_devices);
+        }
         ui -> actionSave -> setVisible(false);
         break;
 
@@ -186,10 +191,12 @@ void MainWindow::selectWorkMode()
         setWindowState(Qt::WindowMaximized);
         dynamic_cast<QTurnBasedQuiz *>(games.at(0)) -> setThemes(QList<QTheme *>());
         foreach (QGame * game, games)
+        {
+            game -> setFromJsonData(QVariantMap());
             game -> setEditable(true);
+        }
         json_file.clear();
         ui -> actionSave -> setVisible(true);
-        games.at(0) -> setImage(QImage());
         break;
     }
 
@@ -319,7 +326,7 @@ void MainWindow::registration()
 {
     QRegistrationDialog * rd;
     rd = new QRegistrationDialog(this,reg_devices);
-    connect(this,SIGNAL(signalRCClicked(uint)),rd,SLOT(rcLicked(uint)));
+    connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),rd,SLOT(rcLicked(uint)));
     if (rd -> exec() == QDialog::Accepted)
     {
         reg_devices = rd -> getRegDevices();

@@ -9,5 +9,8 @@
         <file>images/papirus.jpg</file>
         <file>images/minus.png</file>
         <file>images/plus.png</file>
+        <file>images/bad_answer.png</file>
+        <file>images/good_answer.png</file>
+        <file>images/unknown_answer.png</file>
     </qresource>
 </RCC>

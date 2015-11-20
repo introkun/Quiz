@@ -97,6 +97,8 @@ void QQuestionsTableWidget::setQuestions(const QList<QQuestion> & questions)
 {
     QStringList answers;
     clearContents();
+    while(rowCount())
+        removeRow(0);
     setSortingEnabled(false);
     blockSignals(true);
     model() -> blockSignals(true);
@@ -137,7 +139,7 @@ QList<QQuestion> QQuestionsTableWidget::questions() const
             question.setGoodAnswerIndex(dynamic_cast<QComboBox *>(cellWidget(i,5)) -> currentText().toInt());
             question.setQuestion(item(i,0) -> text());
             for (int k = 0; k < 4; k++)
-                answers.append(item(i,k) -> text());
+                answers.append(item(i,k + 1) -> text());
             question.setAnswers(answers);
             question.setRating(dynamic_cast<QComboBox *>(cellWidget(i,5)) -> currentText().toInt());
             result_questions.append(question);

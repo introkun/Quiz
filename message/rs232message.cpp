@@ -236,9 +236,9 @@ QRS232Message::PARSE_RESULT QRS232Message::parse()
                 return PARSE_UNKNOWN_CMD;
             for (int i = 9; i < buf.count() - 2; i++)
                 netro_buf.append(buf.at(i));
-            return PARSE_OK;
-
         default:
+            for (int i = 9; i < buf.count() - 2; i++)
+                netro_buf.append(buf.at(i));
             return PARSE_OK;
         }
     }

@@ -27,7 +27,7 @@ public:
 
     QList<QFont> fonts() const { return _fonts;}
     virtual void setFonts(const QList<QFont> & new_fonts) {_fonts = new_fonts;}
-    void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list){_rc_list = rc_list;}
+    virtual void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list){_rc_list = rc_list;}
     QList<QRegistrationDialog::REG_DEVICE_T> rcList() const {return _rc_list;}
 
     //Получить карту json кода игры
