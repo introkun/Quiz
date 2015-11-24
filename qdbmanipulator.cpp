@@ -90,7 +90,7 @@ bool QDbManipulator::save(const QString & fileName,const QList<QGame *> & game_l
 }
 
 
-bool QDbManipulator::loadConfiguration(QList<QRegistrationDialog::REG_DEVICE_T> & devices, QList<QFont> & fonts)
+bool QDbManipulator::loadConfiguration(QList<QRegistrationDialog::REG_DEVICE_T> & devices)
 {
     QFile jf("registration.conf");
     if (!jf.open(QIODevice::ReadOnly))
@@ -117,20 +117,10 @@ bool QDbManipulator::loadConfiguration(QList<QRegistrationDialog::REG_DEVICE_T> 
         reg_device.name = reg_map["name"].toString();
         devices.append(reg_device);
     }
-
-    QVariantList font_list = file_map["fonts"].toList();
-
-    //выделяем шрифты
-    foreach(QVariant value, font_list)
-    {
-        QFont font;
-        if (font.fromString(value.toString()))
-            fonts.append(font);
-    }
     return true;
 }
 
-bool QDbManipulator::saveConfiguration(const QList<QRegistrationDialog::REG_DEVICE_T> & reg_devices, const QList<QFont> & fonts)
+bool QDbManipulator::saveConfiguration(const QList<QRegistrationDialog::REG_DEVICE_T> & reg_devices)
 {
     QFile jf("registration.conf");
     if (!jf.open(QIODevice::WriteOnly))
@@ -148,14 +138,7 @@ bool QDbManipulator::saveConfiguration(const QList<QRegistrationDialog::REG_DEVI
         reg_list.append(reg_map);
     }
 
-    QVariantList font_list;
-    foreach (QFont font, fonts)
-    {
-        font_list.append(font.toString());
-    }
-
     file_map["registration"] = reg_list;
-    file_map["fonts"] = font_list;
     QJsonObject json_obj;
     QJsonDocument json_doc;
     json_obj = QJsonObject::fromVariantMap(file_map);

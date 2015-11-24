@@ -3,6 +3,7 @@
 #include "qdbmanipulator.h"
 #include "qchoicedialog.h"
 #include "qaboutdialog.h"
+#include "game/qgamefontsdialog.h"
 #include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui -> actionClearPicture,SIGNAL(triggered()),this,SLOT(clearPicture()));
     connect(ui -> actionRegistration,SIGNAL(triggered()),this,SLOT(registration()));
     connect(ui -> actionModemReset,SIGNAL(triggered()),this,SLOT(reconnect()));
+    connect(ui -> actionGameFonts,SIGNAL(triggered()),this,SLOT(changeGamesFonts()));
     connect(ui -> actionAbout,SIGNAL(triggered()),this,SLOT(showAbout()));
     ui -> actionSave -> setText(tr("Сохранить"));
     ui -> actionMode -> setText(tr("Сменить режим работы"));
@@ -41,40 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> actionClearPicture -> setText(tr("Сбросить картинку"));
     ui -> menuPicture -> setTitle(tr("Картинка"));
     ui -> menu -> setTitle(tr("Файл"));
-    ui -> menuFonts -> setTitle(tr("Шрифты"));
+    ui -> menuSettings -> setTitle(tr("Настройки"));
+    ui -> actionGameFonts -> setText(tr("Игровые шрифты"));
+    ui -> actionGameSettings -> setText(tr("Игровые настройки"));
     ui -> actionAbout -> setText(tr("О программе"));
     first_show = true;
-    QString s;    
-    QList <QFont> fonts;
-    for (int i = 0; i < QTurnBasedQuiz::FONT_LAST; i++)
-    {
-        switch (i)
-        {
-        case QTurnBasedQuiz::FONT_CAPTION:
-            s = tr("Шрифт заголовка");
-            break;
-        case QTurnBasedQuiz::FONT_QUESTION:
-            s = tr("Шрифт вопроса");
-            break;
-        case QTurnBasedQuiz::FONT_TIME:
-            s = tr("Шрифт времени");
-            break;
-        case QTurnBasedQuiz::FONT_ANSWER:
-            s = tr("Шрифт ответа");
-            break;
-        case QTurnBasedQuiz::FONT_QUEUE:
-            s = tr("Шрифт очереди");
-            break;
-        case QTurnBasedQuiz::FONT_BUTTON:
-            s = tr("Шрифт кнопки");
-            break;
-        }
-        fonts.append(font());      
-        font_actions.append(new QAction(s,this));
-        connect(font_actions.last(),SIGNAL(triggered()),this,SLOT(changeFont()));
-    }
-    games.at(0)-> setFonts(fonts);
-    ui -> menuFonts -> addActions(font_actions);
     set_interface_status(false);
 }
 
@@ -107,13 +80,9 @@ void MainWindow::showEvent (QShowEvent * event)
     event -> accept();
     if (first_show)
     {
-        QList<QFont> tmp_fonts;
         emit signal_start_autoconnect();
         first_show = false;
-        if (QDbManipulator::loadConfiguration(reg_devices, tmp_fonts))
-        {
-            games.at(0) -> setFonts(tmp_fonts);
-        }
+        QDbManipulator::loadConfiguration(reg_devices);
         selectWorkMode();
     }
 }
@@ -283,6 +252,15 @@ void MainWindow::modem_on_port()
 }
 
 
+void MainWindow::changeGamesFonts()
+{
+    QGameFontsDialog * gfd = new QGameFontsDialog(this,games);
+    if (gfd -> exec() == QDialog::Accepted)
+        emit signalNeedSave();
+    delete gfd;
+}
+
+
 void MainWindow::setPicture()
 {
     QString pic_file = QFileDialog::getOpenFileName(this,tr("Загрузка файла картинки"), "","*.jpg;*.png;*.jpeg");
@@ -300,28 +278,6 @@ void MainWindow::clearPicture()
 }
 
 
-void MainWindow::changeFont()
-{
-    bool ok;
-    QFont new_font;
-    QList<QFont> fonts;
-    for (int i = 0; i < font_actions.size(); i++)
-        if (sender() == font_actions.at(i))
-        {
-            fonts = games.at(0) -> fonts();
-            new_font = QFontDialog::getFont(&ok,fonts.at(i),this);
-            if (ok)
-            {
-
-                fonts.replace(i,new_font);
-                games.at(0) -> setFonts(fonts);
-                QDbManipulator::saveConfiguration(reg_devices,fonts);
-            }
-            break;
-        }
-}
-
-
 void MainWindow::registration()
 {
     QRegistrationDialog * rd;
@@ -332,7 +288,7 @@ void MainWindow::registration()
         reg_devices = rd -> getRegDevices();
         foreach(QGame * game,games)
             game -> setRCList(reg_devices);
-        QDbManipulator::saveConfiguration(reg_devices,games.at(0) -> fonts());
+        QDbManipulator::saveConfiguration(reg_devices);
     }
     delete rd;
 }

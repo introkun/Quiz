@@ -9,6 +9,36 @@ QTurnBasedQuiz::QTurnBasedQuiz(QWidget *parent) :
     layoutMain -> setContentsMargins(1,1,1,1);
     layoutMain -> setSpacing(1);
     setLayout(layoutMain);
+    GAME_FONT _font;
+    QString s;
+    for (int i = 0; i < FONT_LAST; i++)
+    {
+        switch (i)
+        {
+        case FONT_CAPTION:
+            s = tr("Шрифт заголовка");
+            break;
+        case FONT_QUESTION:
+            s = tr("Шрифт вопроса");
+            break;
+        case FONT_TIME:
+            s = tr("Шрифт времени");
+            break;
+        case FONT_ANSWER:
+            s = tr("Шрифт ответа");
+            break;
+        case FONT_QUEUE:
+            s = tr("Шрифт очереди");
+            break;
+        case FONT_BUTTON:
+            s = tr("Шрифт кнопки");
+            break;
+        }
+        _font.name = s;
+        _font.font = font();
+        _fonts.append(_font);
+    }
+
 }
 
 QTurnBasedQuiz::~QTurnBasedQuiz()
@@ -77,15 +107,6 @@ QString QTurnBasedQuiz::name() const
 }
 
 
-void QTurnBasedQuiz::setFonts(const QList<QFont> & new_fonts)
-{
-    _fonts = new_fonts;
-    //наращиваем количество шрифтов до количества, необходимого для игры
-    while(_fonts.size() < FONT_LAST)
-        _fonts.append(font());
-}
-
-
 void QTurnBasedQuiz::questionClicked(QQuestionWidget * widget,Qt::MouseButton button)
 {
     QTheme * theme;
@@ -103,7 +124,12 @@ void QTurnBasedQuiz::questionClicked(QQuestionWidget * widget,Qt::MouseButton bu
             image = theme -> image();
             break;
         }
-    QQuestionDialog * qd = new QQuestionDialog(this,widget -> question(),widget -> answer(),image,_fonts,_rc_list,QString("%1(%2)").arg(theme -> name(),QString::number(widget -> rating())));
+
+    QList<QFont> game_fonts;
+    foreach(GAME_FONT game_font,_fonts)
+        game_fonts.append(game_font.font);
+
+    QQuestionDialog * qd = new QQuestionDialog(this,widget -> question(),widget -> answer(),image,game_fonts,_rc_list,QString("%1(%2)").arg(theme -> name(),QString::number(widget -> rating())));
     connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),qd,SLOT(rcClicked(uint,unsigned short)));
     int result = qd -> exec();
     delete qd;
@@ -116,7 +142,7 @@ void QTurnBasedQuiz::questionClicked(QQuestionWidget * widget,Qt::MouseButton bu
 
 
 //Получить карту json кода игры
-QVariantMap QTurnBasedQuiz::getJsonData()
+QVariantMap QTurnBasedQuiz::getJsonData() const
 {
     QVariantList th_list;
     QVariantMap game_map;
@@ -132,6 +158,7 @@ QVariantMap QTurnBasedQuiz::getJsonData()
         picture.save(&buffer, "PNG");
         game_map["picture"] = ba.toBase64();
     }
+    game_map["fonts"] = getJSonFonts();
     return game_map;
 }
 
@@ -151,5 +178,7 @@ bool QTurnBasedQuiz::setFromJsonData(const QVariantMap & map)
 
    if (map["picture"].isValid())
        picture = QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG");
+   if (map["fonts"].isValid())
+       setFromJSonFonts(map["fonts"].toList());
    return true;
 }

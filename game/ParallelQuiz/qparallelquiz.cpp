@@ -114,7 +114,7 @@ void QParallelQuiz::setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & r
 
 
 //Получить карту json кода игры
-QVariantMap QParallelQuiz::getJsonData()
+QVariantMap QParallelQuiz::getJsonData() const
 {
     QVariantMap game_map;
     game_map["type"] = _gameType;
@@ -124,6 +124,7 @@ QVariantMap QParallelQuiz::getJsonData()
         questions_list.append(QObjectHelper::qobject2qvariant(&question));
 
     game_map["questions"] = questions_list;
+    game_map["fonts"] = getJSonFonts();
     return game_map;
 }
 
@@ -142,6 +143,9 @@ bool QParallelQuiz::setFromJsonData(const QVariantMap & map)
 
     if (map["picture"].isValid())
         picture = QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG");
+
+    if (map["fonts"].isValid())
+        setFromJSonFonts(map["fonts"].toList());
     return true;
 }
 

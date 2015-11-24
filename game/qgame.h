@@ -15,6 +15,10 @@ public:
         GAME_CAPTAINQUIZ
     } GAME_TYPE;
 
+    typedef struct _game_font{
+        QString name;
+        QFont font;
+    } GAME_FONT;
     static QGame * createGame(GAME_TYPE gameType,QWidget * parent = 0);
     virtual ~QGame();
     GAME_TYPE gameType() const{return _gameType;}
@@ -25,15 +29,16 @@ public:
     QImage image() const {return picture;}
     virtual void changeSize(){}
 
-    QList<QFont> fonts() const { return _fonts;}
-    virtual void setFonts(const QList<QFont> & new_fonts) {_fonts = new_fonts;}
+    QList<GAME_FONT> fonts() const { return _fonts;}
+    void setFonts(const QList<GAME_FONT> & new_fonts);
     virtual void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list){_rc_list = rc_list;}
     QList<QRegistrationDialog::REG_DEVICE_T> rcList() const {return _rc_list;}
 
     //Получить карту json кода игры
-    virtual QVariantMap getJsonData() = 0;
+    virtual QVariantMap getJsonData() const = 0;
     //Настроить игру из карты JSON
-    virtual  bool setFromJsonData(const QVariantMap & map) = 0;
+    virtual  bool setFromJsonData(const QVariantMap & map)= 0;
+
 
 signals:
     void signalRCClicked(uint,unsigned short);
@@ -41,10 +46,14 @@ public slots:
 
 protected:
     explicit QGame(QWidget *parent = 0);
+
+    QVariantList getJSonFonts() const;
+    void setFromJSonFonts(const QVariantList & font_list);
+
     GAME_TYPE _gameType;
     bool edit_mode;
     QImage picture;
-    QList<QFont> _fonts;
+    QList<GAME_FONT> _fonts;
     QList<QRegistrationDialog::REG_DEVICE_T> _rc_list;
 };
 

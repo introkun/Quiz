@@ -5,7 +5,7 @@
 #include <QLayout>
 #include <QSpacerItem>
 #include "../qgame.h"
-#include "../../qquestionstablewidget.h"
+#include "../qquestionstablewidget.h"
 #include "qteamwidget.h"
 class QParallelQuiz : public QGame
 {
@@ -18,7 +18,7 @@ public:
     virtual void changeSize();
     virtual void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list);
     //Получить карту json кода игры
-    virtual QVariantMap getJsonData();
+    virtual QVariantMap getJsonData() const;
     //Настроить игру из карты JSON
     virtual  bool setFromJsonData(const QVariantMap & map);
 protected:

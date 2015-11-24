@@ -36,3 +36,41 @@ void QGame::setImage(const QImage & picture)
         pal.setBrush(QPalette::Background,QBrush(QPixmap::fromImage(picture).scaled(QSize(width(),height()))));
     setPalette(pal);
 }
+
+
+void QGame::setFonts(const QList<GAME_FONT> & new_fonts)
+{
+    for (int i = 0; i < _fonts.count(); i++)
+        for (int j = 0; j < new_fonts.count(); j++)
+            if (_fonts.at(i).name == new_fonts.at(j).name)
+                _fonts.replace(i,new_fonts.at(j));
+}
+
+QVariantList QGame::getJSonFonts() const
+{
+    QVariantList font_list;
+    foreach (GAME_FONT font,_fonts)
+    {
+        QVariantMap font_map;
+        font_map["name"] = font.name;
+        font_map["font"] = font.font.toString();
+    }
+    return font_list;
+}
+
+
+void QGame::setFromJSonFonts(const QVariantList & font_list)
+{
+    foreach(QVariant value, font_list)
+    {
+        QVariantMap font_map = value.toMap();
+        if (!font_map["name"].isValid() || !font_map["font"].isValid())
+            continue;
+        GAME_FONT font;
+        font.name = font_map["name"].toString();
+        font.font.fromString(font_map["font"].toString());
+        for (int i = 0; i < _fonts.count(); i++)
+            if (_fonts.at(i).name == font.name)
+                _fonts.replace(i,font);
+    }
+}

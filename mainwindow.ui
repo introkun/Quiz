@@ -41,7 +41,6 @@
     </property>
     <addaction name="actionSave"/>
     <addaction name="actionMode"/>
-    <addaction name="actionRegistration"/>
     <addaction name="actionModemReset"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -52,10 +51,14 @@
     <addaction name="actionSetPicture"/>
     <addaction name="actionClearPicture"/>
    </widget>
-   <widget class="QMenu" name="menuFonts">
+   <widget class="QMenu" name="menuSettings">
     <property name="title">
-     <string>Fonts</string>
+     <string>Settings</string>
     </property>
+    <addaction name="actionRegistration"/>
+    <addaction name="separator"/>
+    <addaction name="actionGameFonts"/>
+    <addaction name="actionGameSettings"/>
    </widget>
    <widget class="QMenu" name="menuModemOnline">
     <property name="title">
@@ -70,7 +73,7 @@
    </widget>
    <addaction name="menu"/>
    <addaction name="menuPicture"/>
-   <addaction name="menuFonts"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuModemOnline"/>
    <addaction name="menu_2"/>
   </widget>
@@ -142,6 +145,16 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionGameFonts">
+   <property name="text">
+    <string>gameFonts</string>
+   </property>
+  </action>
+  <action name="actionGameSettings">
+   <property name="text">
+    <string>gameSettings</string>
    </property>
   </action>
  </widget>

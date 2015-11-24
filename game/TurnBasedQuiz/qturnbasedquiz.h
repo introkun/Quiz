@@ -23,10 +23,8 @@ public:
     QList<QTheme *> themes() const {return _themes;}
     virtual void setEditable(bool value);
     virtual QString name() const;
-    virtual void setFonts(const QList<QFont> & new_fonts);
-
     //Получить карту json кода игры
-    virtual QVariantMap getJsonData();
+    virtual QVariantMap getJsonData() const;
     //Настроить игру из карты JSON
     virtual  bool setFromJsonData(const QVariantMap & map);
 signals:

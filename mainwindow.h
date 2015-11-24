@@ -32,9 +32,9 @@ private slots:
     void start_autoconnect();
     void no_modem_on_port();
     void modem_on_port();
+    void changeGamesFonts();
     void setPicture();
     void clearPicture();
-    void changeFont();
     void registration();
     void reconnect();
     void showAbout();
@@ -44,6 +44,7 @@ protected:
 signals:
     void signal_start_autoconnect();
     void signalRCClicked(unsigned int,unsigned short);
+    void signalNeedSave();
 private:
     Ui::MainWindow *ui;
 

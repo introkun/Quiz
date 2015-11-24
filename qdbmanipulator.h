@@ -32,8 +32,8 @@ public:
      */
     static bool save(const QString & fileName,const QList<QGame *> & game_list,QString & error);
 
-    static bool loadConfiguration(QList<QRegistrationDialog::REG_DEVICE_T> & devices, QList<QFont> & fonts);
-    static bool saveConfiguration(const QList<QRegistrationDialog::REG_DEVICE_T> & reg_devices,const QList<QFont> & fonts);
+    static bool loadConfiguration(QList<QRegistrationDialog::REG_DEVICE_T> & devices);
+    static bool saveConfiguration(const QList<QRegistrationDialog::REG_DEVICE_T> & reg_devices);
 
 };
 
