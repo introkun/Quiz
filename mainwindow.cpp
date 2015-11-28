@@ -3,7 +3,7 @@
 #include "qdbmanipulator.h"
 #include "qchoicedialog.h"
 #include "qaboutdialog.h"
-#include "game/qgamefontsdialog.h"
+#include "game/qgamesettingsdialog.h"
 #include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -28,11 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(im,SIGNAL(signal_interface_status(bool)),this,SLOT(set_interface_status(bool)));
     connect(im,SIGNAL(signal_proc_incoming_message(QByteArray)),this,SLOT(rs232_cmd_income(QByteArray)));
     connect(this,SIGNAL(signal_start_autoconnect()),this,SLOT(start_autoconnect()),Qt::QueuedConnection);
-    connect(ui -> actionSetPicture,SIGNAL(triggered()),this,SLOT(setPicture()));
-    connect(ui -> actionClearPicture,SIGNAL(triggered()),this,SLOT(clearPicture()));
     connect(ui -> actionRegistration,SIGNAL(triggered()),this,SLOT(registration()));
     connect(ui -> actionModemReset,SIGNAL(triggered()),this,SLOT(reconnect()));
-    connect(ui -> actionGameFonts,SIGNAL(triggered()),this,SLOT(changeGamesFonts()));
+    connect(ui -> actionGameSettings,SIGNAL(triggered()),this,SLOT(changeGamesSettings()));
     connect(ui -> actionAbout,SIGNAL(triggered()),this,SLOT(showAbout()));
     ui -> actionSave -> setText(tr("Сохранить"));
     ui -> actionMode -> setText(tr("Сменить режим работы"));
@@ -41,7 +39,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> actionQuit -> setText(tr("Выйти"));
     ui -> actionSetPicture -> setText(tr("Установить картинку"));
     ui -> actionClearPicture -> setText(tr("Сбросить картинку"));
-    ui -> menuPicture -> setTitle(tr("Картинка"));
     ui -> menu -> setTitle(tr("Файл"));
     ui -> menuSettings -> setTitle(tr("Настройки"));
     ui -> actionGameFonts -> setText(tr("Игровые шрифты"));
@@ -252,29 +249,12 @@ void MainWindow::modem_on_port()
 }
 
 
-void MainWindow::changeGamesFonts()
+void MainWindow::changeGamesSettings()
 {
-    QGameFontsDialog * gfd = new QGameFontsDialog(this,games);
+    QGameSettingsDialog * gfd = new QGameSettingsDialog(this,games);
     if (gfd -> exec() == QDialog::Accepted)
         emit signalNeedSave();
     delete gfd;
-}
-
-
-void MainWindow::setPicture()
-{
-    QString pic_file = QFileDialog::getOpenFileName(this,tr("Загрузка файла картинки"), "","*.jpg;*.png;*.jpeg");
-    if (pic_file.isEmpty())
-        return;
-    QImage picture;
-    picture.load(pic_file);
-    games.at(0) -> setImage(picture);
-}
-
-
-void MainWindow::clearPicture()
-{
-    games.at(0) -> setImage(QImage());
 }
 
 

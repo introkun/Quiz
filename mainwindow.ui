@@ -44,20 +44,12 @@
     <addaction name="actionModemReset"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuPicture">
-    <property name="title">
-     <string>Picture</string>
-    </property>
-    <addaction name="actionSetPicture"/>
-    <addaction name="actionClearPicture"/>
-   </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
      <string>Settings</string>
     </property>
     <addaction name="actionRegistration"/>
     <addaction name="separator"/>
-    <addaction name="actionGameFonts"/>
     <addaction name="actionGameSettings"/>
    </widget>
    <widget class="QMenu" name="menuModemOnline">
@@ -72,7 +64,6 @@
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menu"/>
-   <addaction name="menuPicture"/>
    <addaction name="menuSettings"/>
    <addaction name="menuModemOnline"/>
    <addaction name="menu_2"/>

@@ -32,9 +32,7 @@ private slots:
     void start_autoconnect();
     void no_modem_on_port();
     void modem_on_port();
-    void changeGamesFonts();
-    void setPicture();
-    void clearPicture();
+    void changeGamesSettings();
     void registration();
     void reconnect();
     void showAbout();

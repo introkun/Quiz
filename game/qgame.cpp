@@ -54,6 +54,7 @@ QVariantList QGame::getJSonFonts() const
         QVariantMap font_map;
         font_map["name"] = font.name;
         font_map["font"] = font.font.toString();
+        font_list.append(font_map);
     }
     return font_list;
 }
