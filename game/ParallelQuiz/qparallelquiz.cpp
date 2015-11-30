@@ -16,13 +16,18 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
     layoutAnswers -> setSpacing(1);
     vspacer = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
     setLayout(layoutMain);
+    labelCaption = new QLabel();
+    labelCaption -> setAlignment(Qt::AlignHCenter);
     labelQuestion = new QLabel();
     labelQuestion -> setAlignment(Qt::AlignHCenter);
     labelQuestion -> setWordWrap(true);
+    labelTime  = new QLabel();
+    labelTime -> setAlignment(Qt::AlignHCenter);
     questionsTable = new QQuestionsTableWidget();
+    mainButton = new QPushButton(tr("Начать"));
     for (int i = 0; i < 4; i++)
     {
-        labelsAnswer.append(new QLabel("<h2>" + tr("Ответ %1").arg(QString::number(i))+ "</h2>"));
+        labelsAnswer.append(new QLabel(tr("Ответ %1").arg(QString::number(i))));
         labelsAnswer.last() -> setAlignment(Qt::AlignCenter);
         labelsAnswer.last() -> setFixedHeight(120);
         labelsAnswer.last() -> setStyleSheet("QLabel{border:5px solid grey; border-radius: 15px;}");
@@ -31,22 +36,58 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
 
     layoutMain -> addWidget(questionsTable);
     layoutMain -> addLayout(layoutCommands);
-    layoutMain -> addSpacerItem(vspacer);
+    layoutMain -> addWidget(labelCaption);
     layoutMain -> addWidget(labelQuestion);
+    layoutMain -> addWidget(labelTime);
+    layoutMain -> addSpacerItem(vspacer);
     layoutMain -> addLayout(layoutAnswers);
+    layoutMain -> addWidget(mainButton);
     setEditable(false);
+    GAME_FONT _font;
+    QString s;
+    for (int i = 0; i < FONT_LAST; i++)
+    {
+        switch (i)
+        {
+        case FONT_CAPTION:
+            s = tr("Шрифт заголовка");
+            break;
+        case FONT_QUESTION:
+            s = tr("Шрифт вопроса");
+            break;
+        case FONT_TIME:
+            s = tr("Шрифт времени");
+            break;
+        case FONT_ANSWER:
+            s = tr("Шрифт ответа");
+            break;
+        case FONT_BUTTON:
+            s = tr("Шрифт кнопки");
+            break;
+        }
+        _font.name = s;
+        _font.font = font();
+        _fonts.append(_font);
+    }
+
 }
 
 QParallelQuiz::~QParallelQuiz()
 {
+    foreach (QTeamWidget * team,teams)
+        delete team;
+    foreach(QWidget * widget,labelsAnswer)
+        delete widget;
     layoutMain -> removeItem(vspacer);
     delete vspacer;
     delete questionsTable;
+    delete labelTime;
+    delete labelQuestion;
+    delete labelCaption;
+    delete mainButton;
     delete layoutCommands;
     delete layoutAnswers;
     delete layoutMain;
-    foreach (QTeamWidget * team,teams)
-        delete team;
 }
 
 void QParallelQuiz::showEvent(QShowEvent * event)
@@ -79,16 +120,18 @@ void QParallelQuiz::setEditable(bool value)
         vspacer -> changeSize(1,1);
     else
         vspacer -> changeSize(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+    labelCaption -> setVisible(!value);
     labelQuestion -> setVisible(!value);
+    labelTime -> setVisible(!value);
     adjustSize();
     if (!value )
     {
         QList<QQuestion> quest_list = questionsTable -> questions();
         if (quest_list.count())
         {
-            labelQuestion -> setText("<h1>" + quest_list.first().question() + "</h1>");
+            labelQuestion -> setText(quest_list.first().question());
             for (int i = 0; i < quest_list.first().answers().count(); i++)
-                labelsAnswer.at(i) -> setText("<h2>" + tr("%1) %2").arg(QString::number(i + 1),quest_list.first().answers().at(i))+ "</h2>");
+                labelsAnswer.at(i) -> setText(tr("%1) %2").arg(QString::number(i + 1),quest_list.first().answers().at(i)));
         }
     }
 }
@@ -110,6 +153,18 @@ void QParallelQuiz::setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & r
         i++;
     }
     setEditable(edit_mode);
+}
+
+
+void QParallelQuiz::setFonts(const QList<GAME_FONT> & new_fonts)
+{
+    QGame::setFonts(new_fonts);
+    labelCaption -> setFont(_fonts.at(FONT_CAPTION).font);
+    labelQuestion -> setFont(_fonts.at(FONT_QUESTION).font);
+    labelTime -> setFont(_fonts.at(FONT_TIME).font);
+    foreach (QLabel * labelAnswer,labelsAnswer)
+        labelAnswer -> setFont(_fonts.at(FONT_ANSWER).font);
+    mainButton -> setFont(_fonts.at(FONT_BUTTON).font);
 }
 
 

@@ -74,4 +74,5 @@ void QGame::setFromJSonFonts(const QVariantList & font_list)
             if (_fonts.at(i).name == font.name)
                 _fonts.replace(i,font);
     }
+    setFonts(_fonts);
 }

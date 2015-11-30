@@ -17,6 +17,8 @@ public:
     virtual void setEditable(bool value);
     virtual void changeSize();
     virtual void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list);
+    virtual void setFonts(const QList<GAME_FONT> & new_fonts);
+
     //Получить карту json кода игры
     virtual QVariantMap getJsonData() const;
     //Настроить игру из карты JSON
@@ -24,12 +26,22 @@ public:
 protected:
     virtual void showEvent(QShowEvent * event);
 private:
+    typedef enum {
+        FONT_CAPTION = 0,
+        FONT_QUESTION,
+        FONT_TIME,
+        FONT_ANSWER,
+        FONT_BUTTON,
+        FONT_LAST
+    } FONT_ACTIONS;
+
     QQuestionsTableWidget * questionsTable;
     QGridLayout * layoutAnswers, * layoutCommands;
     QVBoxLayout * layoutMain;
     QSpacerItem * vspacer;
     QList<QTeamWidget *> teams;
     QPushButton * mainButton;
+    QLabel * labelCaption;
     QLabel * labelQuestion;
     QLabel * labelTime;
     QList<QLabel *> labelsAnswer;

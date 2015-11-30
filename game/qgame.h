@@ -30,7 +30,7 @@ public:
     virtual void changeSize(){}
 
     QList<GAME_FONT> fonts() const { return _fonts;}
-    void setFonts(const QList<GAME_FONT> & new_fonts);
+    virtual void setFonts(const QList<GAME_FONT> & new_fonts);
     virtual void setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & rc_list){_rc_list = rc_list;}
     QList<QRegistrationDialog::REG_DEVICE_T> rcList() const {return _rc_list;}
 
