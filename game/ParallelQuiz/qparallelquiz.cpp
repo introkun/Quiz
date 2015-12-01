@@ -1,6 +1,7 @@
 #include "../../qobjecthelper.h"
 #include "qparallelquiz.h"
-
+#define ATTENTION_TEXT "<h4>" +tr("Внимание, вопрос!") + "<h4>"
+#define ANSWER_TIME_SEC 30
 QParallelQuiz::QParallelQuiz(QWidget *parent) :
     QGame(parent)
 {
@@ -14,7 +15,8 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
     layoutAnswers = new QGridLayout();
     layoutAnswers -> setContentsMargins(1,1,1,1);
     layoutAnswers -> setSpacing(1);
-    vspacer = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+    vspacer1 = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+    vspacer2 = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
     setLayout(layoutMain);
     labelCaption = new QLabel();
     labelCaption -> setAlignment(Qt::AlignHCenter);
@@ -36,13 +38,14 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
 
     layoutMain -> addWidget(questionsTable);
     layoutMain -> addLayout(layoutCommands);
+    layoutMain -> addSpacerItem(vspacer1);
     layoutMain -> addWidget(labelCaption);
     layoutMain -> addWidget(labelQuestion);
     layoutMain -> addWidget(labelTime);
-    layoutMain -> addSpacerItem(vspacer);
+    layoutMain -> addSpacerItem(vspacer2);
     layoutMain -> addLayout(layoutAnswers);
     layoutMain -> addWidget(mainButton);
-    setEditable(false);
+
     GAME_FONT _font;
     QString s;
     for (int i = 0; i < FONT_LAST; i++)
@@ -69,17 +72,31 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
         _font.font = font();
         _fonts.append(_font);
     }
-
+    timer = new QTimer();
+    timer -> start(100);
+    connect(timer,SIGNAL(timeout()),this,SLOT(timerTick()));
+    setStage(STAGE_NONE);
+    setEditable(false);
+    main_sound = new QSound(":/sounds/time.wav");
+    main_sound -> setLoops(-1);
+    connect(mainButton,SIGNAL(clicked()),this,SLOT(startQuestion()));
+    connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),this,SLOT(rcClicked(uint,unsigned short)));
 }
 
 QParallelQuiz::~QParallelQuiz()
 {
+    main_sound -> stop();
+    delete main_sound;
+    timer -> stop();
+    delete timer;
     foreach (QTeamWidget * team,teams)
         delete team;
     foreach(QWidget * widget,labelsAnswer)
         delete widget;
-    layoutMain -> removeItem(vspacer);
-    delete vspacer;
+    layoutMain -> removeItem(vspacer1);
+    layoutMain -> removeItem(vspacer2);
+    delete vspacer1;
+    delete vspacer2;
     delete questionsTable;
     delete labelTime;
     delete labelQuestion;
@@ -117,23 +134,21 @@ void QParallelQuiz::setEditable(bool value)
     foreach(QLabel * labelAnswer,labelsAnswer)
         labelAnswer -> setVisible(!value);
     if (value)
-        vspacer -> changeSize(1,1);
+    {
+        vspacer1 -> changeSize(1,1);
+        vspacer2 -> changeSize(1,1);
+    }
     else
-        vspacer -> changeSize(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+    {
+        vspacer1 -> changeSize(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+        vspacer2 -> changeSize(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+    }
     labelCaption -> setVisible(!value);
     labelQuestion -> setVisible(!value);
     labelTime -> setVisible(!value);
     adjustSize();
-    if (!value )
-    {
-        QList<QQuestion> quest_list = questionsTable -> questions();
-        if (quest_list.count())
-        {
-            labelQuestion -> setText(quest_list.first().question());
-            for (int i = 0; i < quest_list.first().answers().count(); i++)
-                labelsAnswer.at(i) -> setText(tr("%1) %2").arg(QString::number(i + 1),quest_list.first().answers().at(i)));
-        }
-    }
+    if (!value)
+        setStage(stage);
 }
 
 
@@ -149,7 +164,7 @@ void QParallelQuiz::setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & r
     {
         teams.append(new QTeamWidget(this,rc.mac,rc.name));
         layoutCommands -> addWidget(teams.last(),i / 4, i % 4);
-        teams.last() -> prepareForQuestion();
+        //teams.last() -> prepareForQuestion();
         i++;
     }
     setEditable(edit_mode);
@@ -195,12 +210,184 @@ bool QParallelQuiz::setFromJsonData(const QVariantMap & map)
         questions.append(question);
     }
     questionsTable -> setQuestions(questions);
-
+    this -> questions =  questionsTable -> questions();
     if (map["picture"].isValid())
         picture = QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG");
 
     if (map["fonts"].isValid())
         setFromJSonFonts(map["fonts"].toList());
     return true;
+}
+
+void QParallelQuiz::setStage(STAGE_T stage)
+{
+    this -> stage = stage;
+    switch (stage)
+    {
+    case STAGE_NONE:
+        labelCaption -> hide();
+        labelQuestion -> hide();
+        labelTime -> hide();
+        foreach (QLabel * label,labelsAnswer)
+            label -> hide();
+        mainButton -> setEnabled(true && !isEditable());
+        break;
+    case STAGE_PREPARE:
+        ticks = 0;
+        labelCaption -> show();
+        labelQuestion -> hide();
+        foreach (QLabel * label,labelsAnswer)
+            label -> hide();
+        foreach (QTeamWidget * widget,teams)
+            widget -> prepareForQuestion();
+        mainButton -> setEnabled(false);
+        break;
+    case STAGE_QUESTION:
+        ticks = -1;
+        next_tick = 0;
+        question_parts = 0;
+        labelQuestion -> show();
+        break;
+    case STAGE_TIMING:
+        ticks = -1;
+        for (int i = 0; i < labelsAnswer.count() ; i++)
+        {
+            labelsAnswer.at(i) -> show();
+            labelsAnswer.at(i) -> setStyleSheet("QLabel{border:5px solid gray; border-radius: 15px;}");
+            labelsAnswer.at(i) -> setText(tr("%1) %2").arg(QString::number(i + 1),questions.first().answers().at(i)));
+        }
+        main_sound -> play();
+        labelTime -> show();
+        break;
+    case STAGE_ANSWERING:
+        if (questions.count() > 1)
+        {
+            mainButton -> setEnabled(true);
+            mainButton -> setText(tr("Следующий вопрос"));
+        }
+        main_sound -> stop();
+        QSound::play(":/sounds/answer.wav");
+        labelTime -> hide();
+        showAnswer();
+        break;
+    default:
+        break;
+    }
+}
+
+void QParallelQuiz::showAnswer()
+{
+    for (int i = 0; i < labelsAnswer.count(); i++)
+        if (questions.first().goodAnswerIndex() - 1 == i)
+            labelsAnswer.at(i) -> setStyleSheet("QLabel{border:5px solid green; border-radius: 15px;}");
+        else
+            labelsAnswer.at(i) -> setStyleSheet("QLabel{border:5px solid red; border-radius: 15px;}");
+}
+
+void QParallelQuiz::timerTick()
+{
+
+    switch (stage)
+    {
+    case STAGE_NONE:
+        return;
+
+    case STAGE_PREPARE:
+        if (ticks % 10 == 0)
+        {
+            QString color = "red";
+            if (ticks % 20 == 0)
+                color = "black";
+            labelCaption -> setText(QString("<font color=""%1"">").arg(color) + ATTENTION_TEXT + "</font>");
+        }
+        if (ticks >= 40)
+            setStage(STAGE_QUESTION);
+        break;
+
+    case STAGE_QUESTION:
+
+        if (next_tick == ticks)
+        {
+            QStringList sl = questions.first().question().split(" ");
+            question_parts++;
+            if (question_parts > (unsigned int)sl.count())
+            {
+                setStage(STAGE_TIMING);
+                break;
+            }
+            while (question_parts < (unsigned int)sl.count())
+                sl.removeLast();
+            labelQuestion -> setText(sl.join(" "));
+            next_tick = sl.join(" ").count();
+        }
+        break;
+
+    case STAGE_TIMING:
+    {
+        bool next_stage = true;
+        //а вдруг все ответили? чего тогда ждать
+        foreach (QTeamWidget * widget, teams)
+        {
+            if (widget -> isUnknownAnswer())
+            {
+                next_stage = false;
+                break;
+            }
+        }
+        if (next_stage)
+            ticks = 10 * ANSWER_TIME_SEC;
+
+        if (ticks % 10 == 0)
+        {
+            labelTime -> setText(tr("Время для размышления: %1 секунд").arg(QString::number(ANSWER_TIME_SEC - ticks / 10)));
+            if (ANSWER_TIME_SEC == ticks / 10)
+                setStage(STAGE_ANSWERING);
+        }
+
+
+
+        break;
+    }
+    case STAGE_ANSWERING:            
+        break;
+    }
+    ticks++;
+}
+
+
+void QParallelQuiz::startQuestion()
+{
+    if (!questions.count())
+        return;
+    if (stage == STAGE_ANSWERING)
+        questions.removeFirst();
+
+    if (!questions.count())
+        return;
+    setStage(STAGE_PREPARE);
+}
+
+
+void QParallelQuiz::rcClicked(unsigned int mac,unsigned short group)
+{
+    if (stage != STAGE_TIMING)
+        return;
+    foreach (QTeamWidget * widget,teams)
+        if (widget -> id() == mac)
+        {
+            if (!widget -> isUnknownAnswer())
+                return;
+            if (questions.first().goodAnswerIndex() == group)
+            {
+                QSound::play(":/sounds/truestart.wav");
+                widget -> increaseTrue();
+            }
+            else
+            {
+                QSound::play(":/sounds/falsestart.wav");
+                widget -> increaseFalse();
+            }
+            return;
+        }
 }
 

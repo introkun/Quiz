@@ -14,6 +14,8 @@ public:
     void increaseTrue();
     void increaseFalse();
     void prepareForQuestion();
+    bool isUnknownAnswer() const {return unknown;}
+    uint id() const {return _id;}
 private:
     void updateInfo();
     QVBoxLayout * layout;
@@ -25,7 +27,7 @@ private:
     QLabel * label_quest_false;//метка отображения количества неправильных ответов
     QLabel * label_quest_unknown;//метка отображения количества неотвеченных
 
-    uint id;//id пульта команды
+    uint _id;//id пульта команды
     int quest_true;
     int quest_false;
     int quest_unknown;
