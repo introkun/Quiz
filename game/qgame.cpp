@@ -22,6 +22,8 @@ QGame * QGame::createGame(GAME_TYPE gameType, QWidget * parent)
         return new QParallelQuiz(parent);
     case GAME_CAPTAINQUIZ:
         return 0;
+    default:
+        return 0;
     }
 }
 

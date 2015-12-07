@@ -32,6 +32,8 @@ private:
         FONT_TIME,
         FONT_ANSWER,
         FONT_BUTTON,
+        FONT_TEAM_NAME,
+        FONT_TEAM_RESULTS,
         FONT_LAST
     } FONT_ACTIONS;
 

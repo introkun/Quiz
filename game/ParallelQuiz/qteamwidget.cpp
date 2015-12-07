@@ -8,11 +8,12 @@ QTeamWidget::QTeamWidget(QWidget *parent, uint id, const QString & team_name) :
     layout = new QVBoxLayout(this);
     layout_main = new QHBoxLayout();
     layout_info = new QVBoxLayout();
-    label_name = new QLabel("<h2>" + team_name + "</h2>");//Название команды
+    label_name = new QLabel(team_name);//Название команды
     label_quest_status = new QLabel();//метка отображения ответа на текущий вопрос
     label_quest_true = new QLabel();//метка отображения количества правильных ответов
     label_quest_false = new QLabel();//метка отображения количества неправильных ответов
     label_quest_unknown = new QLabel();//метка отображения количества неотвеченных
+    spacer = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
 
     layout -> addWidget(label_name);
     layout -> addLayout(layout_main);
@@ -21,6 +22,7 @@ QTeamWidget::QTeamWidget(QWidget *parent, uint id, const QString & team_name) :
     layout_info -> addWidget(label_quest_true);
     layout_info -> addWidget(label_quest_false);
     layout_info -> addWidget(label_quest_unknown);
+    layout_info -> addSpacerItem(spacer);
     label_quest_status -> setFixedSize(100,100);
     label_name -> setAlignment(Qt::AlignHCenter);
     setFrameShape(QFrame::Box);
@@ -30,6 +32,8 @@ QTeamWidget::QTeamWidget(QWidget *parent, uint id, const QString & team_name) :
 
 QTeamWidget::~QTeamWidget()
 {
+    layout_info -> removeItem(spacer);
+    delete spacer;
     delete label_quest_status;
     delete label_quest_true;
     delete label_quest_false;
@@ -53,9 +57,9 @@ void QTeamWidget::clearResults()
 
 void QTeamWidget::updateInfo()
 {
-    label_quest_false -> setText("<h3><font color = ""red"">" + tr("Неправильно: %1").arg(QString::number(quest_false)) + "</font></h3>");
-    label_quest_true -> setText("<h3><font color = ""green"">" + tr("Правильно: %1").arg(QString::number(quest_true)) + "</font></h3>");
-    label_quest_unknown -> setText("<h3><font color = ""black"">" + tr("Не отвечено: %1").arg(QString::number(quest_unknown)) + "</font></h3>");
+    label_quest_false -> setText("<font color = ""red"">" + tr("Неправильно: %1").arg(QString::number(quest_false)) + "</font>");
+    label_quest_true -> setText("<font color = ""green"">" + tr("Правильно: %1").arg(QString::number(quest_true)) + "</font>");
+    label_quest_unknown -> setText("<h3><font color = ""black"">" + tr("Не отвечено: %1").arg(QString::number(quest_unknown)) + "</font>");
 }
 
 void QTeamWidget::increaseTrue()
@@ -81,4 +85,13 @@ void QTeamWidget::prepareForQuestion()
     unknown = true;
     label_quest_status -> setPixmap(QPixmap(":/images/unknown_answer.png").scaled(label_quest_status -> size()));
     updateInfo();
+}
+
+
+void QTeamWidget::setFonts(const QFont & team_font, const QFont & results_font)
+{
+    label_name -> setFont(team_font);
+    label_quest_false -> setFont(results_font);
+    label_quest_true -> setFont(results_font);
+    label_quest_unknown -> setFont(results_font);
 }

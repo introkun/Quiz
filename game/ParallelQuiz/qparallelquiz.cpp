@@ -29,6 +29,7 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
     {
         labelsAnswer.append(new QLabel(tr("Ответ %1").arg(QString::number(i))));
         labelsAnswer.last() -> setAlignment(Qt::AlignCenter);
+        labelsAnswer.last() -> setWordWrap(true);
         labelsAnswer.last() -> setFixedHeight(120);
         labelsAnswer.last() -> setStyleSheet("QLabel{border:5px solid grey; border-radius: 15px;}");
         layoutAnswers -> addWidget(labelsAnswer.last(), i / 2, i % 2);
@@ -63,6 +64,12 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
             break;
         case FONT_BUTTON:
             s = tr("Шрифт кнопки");
+            break;
+        case FONT_TEAM_NAME:
+            s = tr("Шрифт названия команд");
+            break;
+        case FONT_TEAM_RESULTS:
+            s = tr("Шрифт результатов команд");
             break;
         }
         _font.name = s;
@@ -149,6 +156,7 @@ void QParallelQuiz::setRCList(const QList<QRegistrationDialog::REG_DEVICE_T> & r
     {
         teams.append(new QTeamWidget(this,rc.mac,rc.name));
         layoutCommands -> addWidget(teams.last(),i / 4, i % 4);
+        teams.last() -> setFonts(_fonts.at(FONT_TEAM_NAME).font,_fonts.at(FONT_TEAM_RESULTS).font);
         teams.last() -> prepareForQuestion();
         i++;
     }
@@ -165,6 +173,8 @@ void QParallelQuiz::setFonts(const QList<GAME_FONT> & new_fonts)
     foreach (QLabel * labelAnswer,labelsAnswer)
         labelAnswer -> setFont(_fonts.at(FONT_ANSWER).font);
     mainButton -> setFont(_fonts.at(FONT_BUTTON).font);
+    foreach (QTeamWidget * team,teams)
+        team -> setFonts(_fonts.at(FONT_TEAM_NAME).font,_fonts.at(FONT_TEAM_RESULTS).font);
 }
 
 

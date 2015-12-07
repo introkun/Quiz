@@ -14,6 +14,7 @@ public:
     void increaseTrue();
     void increaseFalse();
     void prepareForQuestion();
+    void setFonts(const QFont & team_font, const QFont & results_font);
 private:
     void updateInfo();
     QVBoxLayout * layout;
@@ -24,7 +25,7 @@ private:
     QLabel * label_quest_true;//метка отображения количества правильных ответов
     QLabel * label_quest_false;//метка отображения количества неправильных ответов
     QLabel * label_quest_unknown;//метка отображения количества неотвеченных
-
+    QSpacerItem * spacer;
     uint id;//id пульта команды
     int quest_true;
     int quest_false;
