@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QLayout>
 #include <QSpacerItem>
+#include <QTimer>
+#include <QSound>
 #include "../qgame.h"
 #include "../qquestionstablewidget.h"
 #include "qteamwidget.h"
@@ -23,9 +25,22 @@ public:
     virtual QVariantMap getJsonData() const;
     //Настроить игру из карты JSON
     virtual  bool setFromJsonData(const QVariantMap & map);
+
 protected:
     virtual void showEvent(QShowEvent * event);
+private slots:
+    void timerTick();
+    void startQuestion();
+    void rcClicked(unsigned int mac,unsigned short group);
+
 private:
+    typedef enum {
+        STAGE_NONE,
+        STAGE_PREPARE,
+        STAGE_QUESTION,
+        STAGE_TIMING,
+        STAGE_ANSWERING
+    } STAGE_T;
     typedef enum {
         FONT_CAPTION = 0,
         FONT_QUESTION,
@@ -36,17 +51,25 @@ private:
         FONT_TEAM_RESULTS,
         FONT_LAST
     } FONT_ACTIONS;
-
+    void setStage(STAGE_T stage);
+    void showAnswer();
     QQuestionsTableWidget * questionsTable;
     QGridLayout * layoutAnswers, * layoutCommands;
     QVBoxLayout * layoutMain;
-    QSpacerItem * vspacer;
+    QSpacerItem * vspacer1,* vspacer2;
     QList<QTeamWidget *> teams;
     QPushButton * mainButton;
     QLabel * labelCaption;
     QLabel * labelQuestion;
     QLabel * labelTime;
     QList<QLabel *> labelsAnswer;
+    QTimer * timer;
+    unsigned int ticks;
+    unsigned int next_tick;
+    unsigned int question_parts;
+    STAGE_T stage;
+    QSound * main_sound;
+    QList<QQuestion> questions;//вопросы для игры
 };
 
 #endif // QPARALLELQUIZ_H

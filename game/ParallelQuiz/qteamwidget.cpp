@@ -3,7 +3,7 @@
 QTeamWidget::QTeamWidget(QWidget *parent, uint id, const QString & team_name) :
     QFrame(parent)
 {
-    this -> id = id;
+    _id = id;
 
     layout = new QVBoxLayout(this);
     layout_main = new QHBoxLayout();

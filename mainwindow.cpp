@@ -196,12 +196,28 @@ void MainWindow::rs232_cmd_income(QByteArray buf)
     if (mess.getCommand() == 0x1509)
     {
         QByteArray cmd_data = mess.netroCommand();
-        if (cmd_data.count() > sizeof(uint32) + sizeof(uint16))
+        if (cmd_data.count() > sizeof(uint32) + sizeof(uint16) + sizeof(uint8) + sizeof(uint8))
         {
             uint32 mac;
             uint16 group;
+            uint8 operation;
             memcpy(&mac,cmd_data.data(),sizeof(uint32));
             memcpy(&group,cmd_data.data() + sizeof(uint32),sizeof(uint16));
+            operation = cmd_data.at(sizeof(uint32) + sizeof(uint16) + sizeof(uint8));
+            //моделируем группу четырехканального пульта с двухканального
+            switch (operation)
+            {
+            case 2://вверх
+                group = (group - 1) * 2 + 1;
+                break;
+            case 3://вниз
+                group *= 2;
+                break;
+            case 6://сценарий
+            default:
+                break;
+            }
+
             emit signalRCClicked(mac,group);
         }
     }

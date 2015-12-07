@@ -1,4 +1,4 @@
-#ifndef QTEAMWIDGET_H
+﻿#ifndef QTEAMWIDGET_H
 #define QTEAMWIDGET_H
 
 #include <QFrame>
@@ -14,7 +14,10 @@ public:
     void increaseTrue();
     void increaseFalse();
     void prepareForQuestion();
+
     void setFonts(const QFont & team_font, const QFont & results_font);
+    bool isUnknownAnswer() const {return unknown;}
+    uint id() const {return _id;}
 private:
     void updateInfo();
     QVBoxLayout * layout;
@@ -26,7 +29,7 @@ private:
     QLabel * label_quest_false;//метка отображения количества неправильных ответов
     QLabel * label_quest_unknown;//метка отображения количества неотвеченных
     QSpacerItem * spacer;
-    uint id;//id пульта команды
+    uint _id;//id пульта команды
     int quest_true;
     int quest_false;
     int quest_unknown;
