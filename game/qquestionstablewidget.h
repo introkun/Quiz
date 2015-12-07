@@ -17,6 +17,8 @@ private slots:
     void menuPopUp();
     void addQuestionRow();
     void deleteQuestionRow();
+signals:
+    void signalNeedSave();
 private:
     void initMenu();
     void deleteMenu();

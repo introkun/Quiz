@@ -37,8 +37,11 @@ private slots:
     void reconnect();
     void showAbout();
     void formResize();
+    void needSaveGames();
+    void updateWindowTitle();
 protected:
     virtual void showEvent (QShowEvent * event);
+    virtual void closeEvent(QCloseEvent * event);
 signals:
     void signal_start_autoconnect();
     void signalRCClicked(unsigned int,unsigned short);
@@ -55,6 +58,7 @@ private:
     QList<QGame *> games;
     QTabWidget * gamesTabWidget;
     Event_Filter * ev_fltr;
+    bool need_save;
 };
 
 #endif // MAINWINDOW_H

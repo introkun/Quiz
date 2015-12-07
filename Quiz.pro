@@ -68,7 +68,8 @@ HEADERS  += mainwindow.h \
     game/qquestion.h \
     game/qquestionstablewidget.h \
     game/qgamesettingsdialog.h \
-    game/qgamesettingswidget.h
+    game/qgamesettingswidget.h \
+    version.h
 
 FORMS    += mainwindow.ui
 

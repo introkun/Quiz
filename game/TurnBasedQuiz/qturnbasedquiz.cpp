@@ -89,7 +89,10 @@ void QTurnBasedQuiz::setThemes(const QList<QTheme *> & themes)
     }
     //связуем нажатие по виджету с открытием вопроса
     foreach (QTheme * theme,_themes )
+    {
         connect(theme,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)),this,SLOT(questionClicked(QQuestionWidget*,Qt::MouseButton)));
+        connect(theme,SIGNAL(signalNeedSave()),this,SIGNAL(signalNeedSave()));
+    }
     fillThemes();
 }
 

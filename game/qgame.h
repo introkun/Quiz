@@ -42,6 +42,7 @@ public:
 
 signals:
     void signalRCClicked(uint,unsigned short);
+    void signalNeedSave();//сигнал необходимости сохранения в файл игры
 public slots:
 
 protected:

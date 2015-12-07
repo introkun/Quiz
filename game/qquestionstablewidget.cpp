@@ -14,7 +14,7 @@ QQuestionsTableWidget::QQuestionsTableWidget(QWidget *parent,bool rating) : QTab
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     if (!rating)
         setColumnHidden(6,true);
-
+    connect(this,SIGNAL(itemChanged(QTableWidgetItem*)),this,SIGNAL(signalNeedSave()));
 }
 
 QQuestionsTableWidget::~QQuestionsTableWidget()
@@ -69,10 +69,12 @@ void QQuestionsTableWidget::addQuestionRow()
     for (int i = 1; i < 5; i++)
         combobox -> addItem(QString::number(i));
     setCellWidget(rowCount() - 1,5,combobox);
+    connect(combobox,SIGNAL(currentIndexChanged(int)),this,SIGNAL(signalNeedSave()));
     combobox = new QComboBox();
     for (int i = 1; i < 15; i++)
-        combobox -> addItem(QString::number(i));
+        combobox -> addItem(QString::number(i));   
     setCellWidget(rowCount() - 1,6,combobox);
+    connect(combobox,SIGNAL(currentIndexChanged(int)),this,SIGNAL(signalNeedSave()));
 }
 
 
@@ -90,6 +92,7 @@ void QQuestionsTableWidget::deleteQuestionRow()
 
     foreach(int row,rows)
         removeRow(row);
+    emit signalNeedSave();
 }
 
 

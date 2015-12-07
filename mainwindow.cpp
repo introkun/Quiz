@@ -3,6 +3,7 @@
 #include "qdbmanipulator.h"
 #include "qchoicedialog.h"
 #include "qaboutdialog.h"
+#include "version.h"
 #include "game/qgamesettingsdialog.h"
 #include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
@@ -45,7 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui -> actionGameSettings -> setText(tr("Игровые настройки"));
     ui -> actionAbout -> setText(tr("О программе"));
     first_show = true;
+    need_save = false;
     set_interface_status(false);
+    updateWindowTitle();
 }
 
 MainWindow::~MainWindow()
@@ -85,6 +88,19 @@ void MainWindow::showEvent (QShowEvent * event)
 }
 
 
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    while (need_save)
+    {
+        if (QMessageBox::warning(this,tr("Внимание"),tr("Текущие изменения в играх не сохранены. Сохранить?"),QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+            saveJSON();
+        else
+            break;
+    }
+    QMainWindow::closeEvent(event);
+}
+
+
 void MainWindow::uiSetupGames(const QList<QGame *> games)
 {
     while(this -> games.count())
@@ -109,7 +125,9 @@ void MainWindow::saveJSON()
         json_file = QFileDialog::getSaveFileName(this,tr("Сохранение файла базы данных"), "","*.json");
     if (json_file.isEmpty())
         return;
-    QDbManipulator::save(json_file,games,error);
+    if (QDbManipulator::save(json_file,games,error))
+        need_save = false;
+
 }
 
 
@@ -128,6 +146,13 @@ void MainWindow::loadJSON()
 
 void MainWindow::selectWorkMode()
 {
+    while (need_save)
+    {
+        if (QMessageBox::warning(this,tr("Внимание"),tr("Текущие изменения в играх не сохранены. Сохранить?"),QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+            saveJSON();
+        else
+            break;
+    }
     QStringList choices;
     choices << tr("Режим игры") << tr("Создание базы вопросов") << tr("Редактирование базы вопросов");
     QChoiceDialog * cd = new QChoiceDialog(this,QChoiceDialog::CHOICE_SINGLE,choices,tr("Выбор режима работы"),tr("Выберите режим работы викторины"));
@@ -173,6 +198,13 @@ void MainWindow::selectWorkMode()
             game -> setEditable(true);
         ui -> actionSave -> setVisible(true);
         break;
+    }
+    need_save = false;
+    updateWindowTitle();
+    foreach (QGame * game, games)
+    {
+        disconnect(game,SIGNAL(signalNeedSave()),this,SLOT(needSaveGames()));
+        connect(game,SIGNAL(signalNeedSave()),this,SLOT(needSaveGames()));
     }
 }
 
@@ -268,8 +300,8 @@ void MainWindow::modem_on_port()
 void MainWindow::changeGamesSettings()
 {
     QGameSettingsDialog * gfd = new QGameSettingsDialog(this,games);
-    if (gfd -> exec() == QDialog::Accepted)
-        emit signalNeedSave();
+    connect(gfd,SIGNAL(signalNeedSave()),this,SLOT(needSaveGames()));
+    gfd -> exec();
     delete gfd;
 }
 
@@ -306,4 +338,17 @@ void MainWindow::formResize()
 {
     foreach(QGame * game,games)
         game -> changeSize();
+}
+
+
+void MainWindow::needSaveGames()
+{
+    need_save = true;
+    updateWindowTitle();
+}
+
+
+void MainWindow::updateWindowTitle()
+{
+    setWindowTitle(QString("Quiz v.%1.%2 %3%4").arg(QString::number(VERSION_MAJOR),VERSION_MINOR,json_file,need_save ? QString("*") : QString()));
 }

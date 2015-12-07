@@ -12,7 +12,7 @@ public:
     explicit QGameSettingsWidget(QWidget *parent = 0,QGame * game = 0);
     virtual ~QGameSettingsWidget();
 signals:
-
+    void signalNeedSave();
 public slots:
     void fontChangeClicked();
 private:

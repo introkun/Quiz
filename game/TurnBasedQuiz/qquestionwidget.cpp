@@ -84,6 +84,8 @@ void QQuestionWidget::setQuestion(const QString & value)
     quest = value;
     questLineEdit -> setText(value);
     connect(questLineEdit,SIGNAL(textChanged(QString)),this,SLOT(setQuestion(QString)));
+    if (edit_mode)
+        emit signalNeedSave();
 }
 
 
@@ -93,6 +95,8 @@ void QQuestionWidget::setAnswer(const QString & value)
     ans = value;
     ansLineEdit -> setText(value);
     connect(ansLineEdit,SIGNAL(textChanged(QString)),this,SLOT(setAnswer(QString)));
+    if (edit_mode)
+        emit signalNeedSave();
 }
 
 

@@ -88,6 +88,7 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
     main_sound -> setLoops(-1);
     connect(mainButton,SIGNAL(clicked()),this,SLOT(startQuestion()));
     connect(this,SIGNAL(signalRCClicked(uint,unsigned short)),this,SLOT(rcClicked(uint,unsigned short)));
+    connect(questionsTable,SIGNAL(signalNeedSave()),this,SIGNAL(signalNeedSave()));
 }
 
 QParallelQuiz::~QParallelQuiz()

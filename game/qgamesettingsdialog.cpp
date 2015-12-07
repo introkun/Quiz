@@ -10,6 +10,7 @@ QGameSettingsDialog::QGameSettingsDialog(QWidget *parent, const QList<QGame *> &
     foreach (QGame * game, games)
     {
         widgets.append(new QGameSettingsWidget(this,game));
+        connect(widgets.last(),SIGNAL(signalNeedSave()),this,SIGNAL(signalNeedSave()));
         tab_widget -> addTab(widgets.last(),game -> name());
     }
     layout_main -> addWidget(tab_widget);

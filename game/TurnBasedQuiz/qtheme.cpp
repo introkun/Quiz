@@ -4,12 +4,14 @@
 QTheme::QTheme(QWidget * parent, int size) : QObject(parent)
 {
     themeWidget = new QThemeWidget();
+    connect(themeWidget,SIGNAL(widgetChanged()),this,SIGNAL(signalNeedSave()));
     for (int i = 0; i < size; i++)
     {
         questionWidgets.append(new QQuestionWidget(parent));
         connect(themeWidget,SIGNAL(signalColorChanged(QColor)),questionWidgets.last(),SLOT(setColor(QColor)));
         connect(questionWidgets.last() ,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)),this,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)));
         questionWidgets.last() -> setRating(i + 1);
+        connect(questionWidgets.last(),SIGNAL(signalNeedSave()),this,SIGNAL(signalNeedSave()));
     }
 }
 
@@ -81,6 +83,7 @@ void QTheme::setThemeMap(const QVariantMap & map)
             questionWidgets.last() -> setRating(quest_map["rating"].toInt());
         connect(themeWidget,SIGNAL(signalColorChanged(QColor)),questionWidgets.last(),SLOT(setColor(QColor)));
         connect(questionWidgets.last() ,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)),this,SIGNAL(signalQuestionClicked(QQuestionWidget*,Qt::MouseButton)));
+        connect(questionWidgets.last(),SIGNAL(signalNeedSave()),this,SIGNAL(signalNeedSave()));
     }
 
     if (map["color"].isValid())

@@ -34,6 +34,7 @@ void QGameSettingsWidget::fontChangeClicked()
     QFont game_font = QFontDialog::getFont(&ok,sender_widget -> font(),this,tr("Выбор шрифта"));
     if (ok)
     {
+        emit signalNeedSave();
         QList<QGame::GAME_FONT> fonts;
         QGame::GAME_FONT change_font;
         sender_widget -> setFont(game_font);

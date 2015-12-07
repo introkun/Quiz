@@ -15,6 +15,7 @@ public:
     explicit QGameSettingsDialog(QWidget *parent = 0,const QList<QGame *> & games = QList<QGame *>());
     virtual ~QGameSettingsDialog();
 signals:
+    void signalNeedSave();
 protected:
     virtual void showEvent(QShowEvent *);
 private:

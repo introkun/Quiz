@@ -22,6 +22,7 @@ public:
     QString name() const {return themeWidget -> themeName();}
 signals:
     void signalQuestionClicked(QQuestionWidget *,Qt::MouseButton);
+    void signalNeedSave();
 private:
     QThemeWidget * themeWidget;
     QList<QQuestionWidget *> questionWidgets;

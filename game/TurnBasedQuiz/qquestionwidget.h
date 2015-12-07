@@ -34,6 +34,7 @@ private slots:
     void slotQuestionClicked(Qt::MouseButton button);
 signals:
     void signalQuestionClicked(QQuestionWidget *,Qt::MouseButton);
+    void signalNeedSave();
 private:
     bool edit_mode;
     QString quest;
