@@ -27,7 +27,7 @@ public:
     virtual QString name() const = 0;
     void setImage(const QImage & picture);
     QImage image() const {return picture;}
-    virtual void changeSize(){}
+    virtual void changeSize();
 
     QList<GAME_FONT> fonts() const { return _fonts;}
     virtual void setFonts(const QList<GAME_FONT> & new_fonts);

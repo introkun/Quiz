@@ -180,8 +180,16 @@ bool QTurnBasedQuiz::setFromJsonData(const QVariantMap & map)
    setThemes(themes);
 
    if (map["picture"].isValid())
-       picture = QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG");
+       setImage(QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG"));
+   else
+       setImage(QImage());
    if (map["fonts"].isValid())
        setFromJSonFonts(map["fonts"].toList());
    return true;
+}
+
+void QTurnBasedQuiz::showEvent(QShowEvent * event)
+{
+    changeSize();
+    QGame::showEvent(event);
 }

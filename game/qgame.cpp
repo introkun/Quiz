@@ -5,6 +5,7 @@ QGame::QGame(QWidget *parent) :
     QWidget(parent)
 {
     setEditable(false);
+    setAutoFillBackground(true);
 }
 
 QGame::~QGame()
@@ -30,13 +31,9 @@ QGame * QGame::createGame(GAME_TYPE gameType, QWidget * parent)
 
 void QGame::setImage(const QImage & picture)
 {
+
     this -> picture = picture;
-    QPalette pal = palette();
-    if (picture.isNull())
-        pal.setBrush(QPalette::Background,QBrush(Qt::color0));
-    else
-        pal.setBrush(QPalette::Background,QBrush(QPixmap::fromImage(picture).scaled(QSize(width(),height()))));
-    setPalette(pal);
+    changeSize();
 }
 
 
@@ -77,4 +74,14 @@ void QGame::setFromJSonFonts(const QVariantList & font_list)
                 _fonts.replace(i,font);
     }
     setFonts(_fonts);
+}
+
+void QGame::changeSize()
+{
+    QPalette pal = palette();
+    if (picture.isNull())
+        pal.setBrush(QPalette::Background,QBrush(Qt::color0));
+    else
+        pal.setBrush(QPalette::Background,QBrush(QPixmap::fromImage(picture).scaled(QSize(width(),height()))));
+    setPalette(pal);
 }

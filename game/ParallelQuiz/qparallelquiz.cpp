@@ -125,6 +125,7 @@ void QParallelQuiz::showEvent(QShowEvent * event)
 void QParallelQuiz::changeSize()
 {
     questionsTable -> changeSize();
+    QGame::changeSize();
 }
 
 QString QParallelQuiz::name() const
@@ -207,6 +208,14 @@ QVariantMap QParallelQuiz::getJsonData() const
 
     game_map["questions"] = questions_list;
     game_map["fonts"] = getJSonFonts();
+    if (!picture.isNull())
+    {
+        QByteArray ba;
+        QBuffer buffer(&ba);
+        buffer.open(QIODevice::WriteOnly);
+        picture.save(&buffer, "PNG");
+        game_map["picture"] = ba.toBase64();
+    }
     return game_map;
 }
 
@@ -224,7 +233,9 @@ bool QParallelQuiz::setFromJsonData(const QVariantMap & map)
     questionsTable -> setQuestions(questions);
     this -> questions =  questionsTable -> questions();
     if (map["picture"].isValid())
-        picture = QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG");
+        setImage(QImage::fromData(QByteArray::fromBase64(map["picture"].toByteArray()),"PNG"));
+    else
+        setImage(QImage());
 
     if (map["fonts"].isValid())
         setFromJSonFonts(map["fonts"].toList());

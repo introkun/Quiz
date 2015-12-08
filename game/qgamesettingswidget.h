@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QToolButton>
 #include <QLayout>
 #include "qgame.h"
 class QGameSettingsWidget : public QWidget
@@ -13,12 +14,14 @@ public:
     virtual ~QGameSettingsWidget();
 signals:
     void signalNeedSave();
-public slots:
+private slots:
+    void pictureClicked();
     void fontChangeClicked();
 private:
     QGame * game;
     QList<QPushButton *> font_buttons;
     QVBoxLayout * layout_main;
+    QToolButton * buttonPicture;
 };
 
 #endif // QGAMESETTINGSWIDGET_H

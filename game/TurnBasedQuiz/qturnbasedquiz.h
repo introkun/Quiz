@@ -18,6 +18,8 @@ public:
     virtual QVariantMap getJsonData() const;
     //Настроить игру из карты JSON
     virtual  bool setFromJsonData(const QVariantMap & map);
+protected:
+    virtual void showEvent(QShowEvent * event);
 signals:
     void signalQuestionClicked(QQuestionWidget*,Qt::MouseButton);
 private slots:

@@ -13,17 +13,21 @@ QTeamWidget::QTeamWidget(QWidget *parent, uint id, const QString & team_name) :
     label_quest_true = new QLabel();//метка отображения количества правильных ответов
     label_quest_false = new QLabel();//метка отображения количества неправильных ответов
     label_quest_unknown = new QLabel();//метка отображения количества неотвеченных
-    spacer = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+    spacer = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Preferred);
 
     layout -> addWidget(label_name);
     layout -> addLayout(layout_main);
     layout_main -> addLayout(layout_info);
-    layout_main -> addWidget(label_quest_status);
-    layout_info -> addWidget(label_quest_true);
-    layout_info -> addWidget(label_quest_false);
-    layout_info -> addWidget(label_quest_unknown);
+    label_quest_true -> setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+    label_quest_false -> setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+    label_quest_unknown -> setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+    layout_main -> addWidget(label_quest_status,0,Qt::AlignCenter);
+    layout_info -> addWidget(label_quest_true,0,Qt::AlignTop);
+    layout_info -> addWidget(label_quest_false,0,Qt::AlignTop);
+    layout_info -> addWidget(label_quest_unknown,0,Qt::AlignTop);
     layout_info -> addSpacerItem(spacer);
-    label_quest_status -> setFixedSize(100,100);
+    label_quest_status -> setMinimumSize(100,100);
+    label_quest_status -> setSizeIncrement(1,1);
     label_name -> setAlignment(Qt::AlignHCenter);
     setFrameShape(QFrame::Box);
     clearResults();
@@ -59,12 +63,12 @@ void QTeamWidget::updateInfo()
 {
     label_quest_false -> setText("<font color = ""red"">" + tr("Неправильно: %1").arg(QString::number(quest_false)) + "</font>");
     label_quest_true -> setText("<font color = ""green"">" + tr("Правильно: %1").arg(QString::number(quest_true)) + "</font>");
-    label_quest_unknown -> setText("<h3><font color = ""black"">" + tr("Не отвечено: %1").arg(QString::number(quest_unknown)) + "</font>");
+    label_quest_unknown -> setText("<font color = ""black"">" + tr("Не отвечено: %1").arg(QString::number(quest_unknown)) + "</font>");
 }
 
 void QTeamWidget::increaseTrue()
 {
-    label_quest_status -> setPixmap(QPixmap(":/images/good_answer.png").scaled(label_quest_status -> size()));
+    label_quest_status -> setPixmap(QPixmap(":/images/good_answer.png").scaled(label_quest_status -> size(),Qt::KeepAspectRatio));
     unknown = false;
     quest_true++;
     updateInfo();
@@ -72,7 +76,7 @@ void QTeamWidget::increaseTrue()
 
 void QTeamWidget::increaseFalse()
 {
-    label_quest_status -> setPixmap(QPixmap(":/images/bad_answer.png").scaled(label_quest_status -> size()));
+    label_quest_status -> setPixmap(QPixmap(":/images/bad_answer.png").scaled(label_quest_status -> size(),Qt::KeepAspectRatio));
     unknown = false;
     quest_false++;
     updateInfo();
@@ -83,7 +87,7 @@ void QTeamWidget::prepareForQuestion()
     if (unknown)
         quest_unknown++;
     unknown = true;
-    label_quest_status -> setPixmap(QPixmap(":/images/unknown_answer.png").scaled(label_quest_status -> size()));
+    label_quest_status -> setPixmap(QPixmap(":/images/unknown_answer.png").scaled(label_quest_status -> size(),Qt::KeepAspectRatio));
     updateInfo();
 }
 

@@ -126,7 +126,10 @@ void MainWindow::saveJSON()
     if (json_file.isEmpty())
         return;
     if (QDbManipulator::save(json_file,games,error))
+    {
         need_save = false;
+        updateWindowTitle();
+    }
 
 }
 
