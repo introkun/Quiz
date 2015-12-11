@@ -250,6 +250,9 @@ void MainWindow::rs232_cmd_income(QByteArray buf)
                 break;
             case 6://сценарий
             default:
+                //для пультов 8501-4М
+                if (group == 3) group = 4;
+                else if (group == 4) group = 3;
                 break;
             }
 

@@ -34,7 +34,7 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
         labelsAnswer.last() -> setWordWrap(true);
         labelsAnswer.last() -> setFixedHeight(120);
         labelsAnswer.last() -> setStyleSheet("QLabel{border:5px solid grey; border-radius: 15px;}");
-        layoutAnswers -> addWidget(labelsAnswer.last(), i / 2, i % 2);
+        layoutAnswers -> addWidget(labelsAnswer.last(), i % 2,i / 2);
     }
 
     layoutMain -> addWidget(questionsTable);
