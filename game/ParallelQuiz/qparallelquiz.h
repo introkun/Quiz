@@ -56,7 +56,8 @@ private:
     QQuestionsTableWidget * questionsTable;
     QGridLayout * layoutAnswers, * layoutCommands;
     QVBoxLayout * layoutMain;
-    QSpacerItem * vspacer1,* vspacer2;
+    //QSpacerItem * vspacer1;
+    QSpacerItem * vspacer2;
     QList<QTeamWidget *> teams;
     QPushButton * mainButton;
     QLabel * labelCaption;

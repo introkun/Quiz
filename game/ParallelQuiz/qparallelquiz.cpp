@@ -15,7 +15,7 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
     layoutAnswers = new QGridLayout();
     layoutAnswers -> setContentsMargins(1,1,1,1);
     layoutAnswers -> setSpacing(1);
-    vspacer1 = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+    //vspacer1 = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
     vspacer2 = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
     setLayout(layoutMain);
     labelCaption = new QLabel();
@@ -32,14 +32,14 @@ QParallelQuiz::QParallelQuiz(QWidget *parent) :
         labelsAnswer.append(new QLabel(tr("Ответ %1").arg(QString::number(i))));
         labelsAnswer.last() -> setAlignment(Qt::AlignCenter);
         labelsAnswer.last() -> setWordWrap(true);
-        labelsAnswer.last() -> setFixedHeight(120);
         labelsAnswer.last() -> setStyleSheet("QLabel{border:5px solid grey; border-radius: 15px;}");
+        labelsAnswer.last() -> setContentsMargins(15,15,15,15);
         layoutAnswers -> addWidget(labelsAnswer.last(), i % 2,i / 2);
     }
 
     layoutMain -> addWidget(questionsTable);
     layoutMain -> addLayout(layoutCommands);
-    layoutMain -> addSpacerItem(vspacer1);
+    //layoutMain -> addSpacerItem(vspacer1);
     layoutMain -> addWidget(labelCaption);
     layoutMain -> addWidget(labelQuestion);
     layoutMain -> addWidget(labelTime);
@@ -101,9 +101,9 @@ QParallelQuiz::~QParallelQuiz()
         delete team;
     foreach(QWidget * widget,labelsAnswer)
         delete widget;
-    layoutMain -> removeItem(vspacer1);
+    //layoutMain -> removeItem(vspacer1);
     layoutMain -> removeItem(vspacer2);
-    delete vspacer1;
+    //delete vspacer1;
     delete vspacer2;
     delete questionsTable;
     delete labelTime;
@@ -144,12 +144,12 @@ void QParallelQuiz::setEditable(bool value)
         labelAnswer -> setVisible(!value);
     if (value)
     {
-        vspacer1 -> changeSize(1,1);
+        //vspacer1 -> changeSize(1,1);
         vspacer2 -> changeSize(1,1);
     }
     else
     {
-        vspacer1 -> changeSize(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
+        //vspacer1 -> changeSize(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
         vspacer2 -> changeSize(1,1,QSizePolicy::Minimum,QSizePolicy::Expanding);
     }
     labelCaption -> setVisible(!value);
@@ -302,9 +302,9 @@ void QParallelQuiz::showAnswer()
 {
     for (int i = 0; i < labelsAnswer.count(); i++)
         if (questions.first().goodAnswerIndex() - 1 == i)
-            labelsAnswer.at(i) -> setStyleSheet("QLabel{border:5px solid green; border-radius: 15px;}");
+            labelsAnswer.at(i) -> setStyleSheet("QLabel{border:5px solid green; border-radius: 15px;background-color: rgba(29,192,100,127)}");
         else
-            labelsAnswer.at(i) -> setStyleSheet("QLabel{border:5px solid red; border-radius: 15px;}");
+            labelsAnswer.at(i) -> setStyleSheet("QLabel{border:5px solid red; border-radius: 15px;background-color: rgba(218,94,119,127)}");
 }
 
 void QParallelQuiz::timerTick()

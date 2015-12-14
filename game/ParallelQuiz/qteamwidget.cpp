@@ -13,7 +13,6 @@ QTeamWidget::QTeamWidget(QWidget *parent, uint id, const QString & team_name) :
     label_quest_true = new QLabel();//метка отображения количества правильных ответов
     label_quest_false = new QLabel();//метка отображения количества неправильных ответов
     label_quest_unknown = new QLabel();//метка отображения количества неотвеченных
-    spacer = new QSpacerItem(1,1,QSizePolicy::Minimum,QSizePolicy::Preferred);
 
     layout -> addWidget(label_name);
     layout -> addLayout(layout_main);
@@ -21,23 +20,23 @@ QTeamWidget::QTeamWidget(QWidget *parent, uint id, const QString & team_name) :
     label_quest_true -> setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
     label_quest_false -> setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
     label_quest_unknown -> setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
-    layout_main -> addWidget(label_quest_status,0,Qt::AlignCenter);
+    layout_main -> addWidget(label_quest_status);
     layout_info -> addWidget(label_quest_true,0,Qt::AlignTop);
     layout_info -> addWidget(label_quest_false,0,Qt::AlignTop);
     layout_info -> addWidget(label_quest_unknown,0,Qt::AlignTop);
-    layout_info -> addSpacerItem(spacer);
-    label_quest_status -> setMinimumSize(100,100);
-    label_quest_status -> setSizeIncrement(1,1);
+    label_quest_status -> setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    label_quest_status -> setAlignment(Qt::AlignCenter);
     label_name -> setAlignment(Qt::AlignHCenter);
-    setFrameShape(QFrame::Box);
+    layout -> setSpacing(1);
+    layout_info -> setSpacing(1);
+    layout_main -> setSpacing(1);
     clearResults();
+    setStyleSheet("QTeamWidget {border: 3px solid black;border-radius: 6px;background-color: rgba(56,174,203,127);}");
 }
 
 
 QTeamWidget::~QTeamWidget()
 {
-    layout_info -> removeItem(spacer);
-    delete spacer;
     delete label_quest_status;
     delete label_quest_true;
     delete label_quest_false;
@@ -87,7 +86,7 @@ void QTeamWidget::prepareForQuestion()
     if (unknown)
         quest_unknown++;
     unknown = true;
-    label_quest_status -> setPixmap(QPixmap(":/images/unknown_answer.png").scaled(label_quest_status -> size(),Qt::KeepAspectRatio));
+    label_quest_status -> setPixmap(QPixmap(":/images/unknown_answer.png").scaled(QSize(width(),label_quest_status -> height()),Qt::KeepAspectRatio));
     updateInfo();
 }
 
